@@ -47,7 +47,7 @@
   font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em;
   color: #dbb9fa; border-bottom: 1px solid #4c4453; padding-bottom: 0.35em;
 }
-#pageBody h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: #ffb77a; }
+#pageBody h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: #f0dbff; }
 #pageBody p  { margin: 0.7em 0; line-height: 1.65; color: #c9c6c4; font-size: 0.9rem; }
 #pageBody a  { color: #dbb9fa; text-decoration: underline; text-underline-offset: 2px; }
 #pageBody a:hover { color: #f0dbff; }
@@ -61,7 +61,7 @@
 }
 #pageBody code {
   font-family: ui-monospace, monospace; font-size: 0.85em;
-  background: #2a2a2a; padding: 0.1em 0.35em; color: #ffdcc2;
+  background: #2a2a2a; padding: 0.1em 0.35em; color: #e5e2e1;
 }
 #pageBody pre {
   background: #0e0e0e; border: 1px solid #4c4453;
@@ -98,7 +98,7 @@
 
 /* ===== Callouts produced from > [!note] style blockquotes ===== */
 #pageBody blockquote.wiki-note   { border-left-color: #6b3d8f; }
-#pageBody blockquote.wiki-warn   { border-left-color: #ffb77a; }
+#pageBody blockquote.wiki-warn   { border-left-color: #ffb4ab; }
 #pageBody blockquote.wiki-tip    { border-left-color: #6fcf6f; }
 
 /* search results */
@@ -106,7 +106,7 @@
   display: block; padding: 0.45rem 0.6rem; font-size: 0.78rem;
   color: #c9c6c4; cursor: pointer; border-left: 2px solid transparent;
 }
-.search-hit:hover, .search-hit.active { background: #2a2a2a; color: #f0dbff; border-left-color: #ffb77a; }
+.search-hit:hover, .search-hit.active { background: #2a2a2a; color: #f0dbff; border-left-color: #6b3d8f; }
 
 /* ===== Wikipedia-layout: tabs ===== */
 .wiki-tabs {
@@ -144,7 +144,7 @@
   font-size: 0.72rem; text-align: center; padding: 1em; cursor: pointer;
   border-bottom: 1px dashed #4c4453;
 }
-.wiki-infobox .ib-photo-empty:hover { color: #ffb77a; border-color: #ffb77a; }
+.wiki-infobox .ib-photo-empty:hover { color: #f0dbff; border-color: #f0dbff; }
 .wiki-infobox .ib-caption {
   font-size: 0.7rem; color: #988d9e; text-align: center; padding: 0.4em 0.8em;
   border-bottom: 1px solid #353534;
@@ -180,12 +180,17 @@
 .wiki-toc a:hover { color: #f0dbff; text-decoration: underline; }
 .wiki-toc .toc-num { color: #988d9e; margin-right: 0.4em; }
 
+/* ===== Interlinks: orange is reserved for these and nothing else ===== */
+#pageBody a[href^="#/"] { color: #ffb77a; text-decoration: none; }
+#pageBody a[href^="#/"]:hover { color: #ffdcc2; text-decoration: none; }
+#pageBody a[href^="#/"]:visited { color: #ffb77a; }
+
 /* ===== Freshness: stale banner + sample ribbon ===== */
 #pageBody::after { content: ""; display: block; clear: both; }
 .stale-ribbon {
   overflow: hidden;
-  background: #2a1f0e; border-left: 3px solid #ffb77a;
-  color: #ffdcc2; font-size: 0.82rem; padding: 0.7em 1em; margin-bottom: 1.2em;
+  background: #201f1f; border-left: 3px solid #988d9e;
+  color: #c9c6c4; font-size: 0.82rem; padding: 0.7em 1em; margin-bottom: 1.2em;
 }
 .sample-wrap { overflow: hidden; }
 .sample-ribbon {

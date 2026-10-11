@@ -81,7 +81,7 @@ tailwind.config = {
     <span class="material-symbols-outlined text-on-primary text-xl">menu_book</span>
     <span class="font-headline font-black tracking-widest uppercase text-on-primary text-sm">NWU Wiki</span>
   </a>
-  <span class="badge-soon" style="background:#201f1f;color:#ffdcc2;border:1px solid #ffb77a33;">community-built</span>
+  <span class="badge-soon" style="background:#201f1f;color:#e5e2e1;border:1px solid #988d9e33;">community-built</span>
   <div class="flex-grow"></div>
   <div class="relative w-56 hidden md:block">
     <input id="wikiSearch" type="text" placeholder="Search pages…"
@@ -98,7 +98,7 @@ tailwind.config = {
   </a>
 </header>
 
-<div class="flex flex-grow min-h-0">
+<div class="flex flex-grow min-h-0 w-full max-w-[1440px] mx-auto">
   <!-- ===== Sidebar ===== -->
   <aside class="w-64 shrink-0 bg-surface-container bevel-out hidden md:flex flex-col m-2 mr-0">
     <nav id="wikiNav" class="p-3 space-y-1 overflow-y-auto text-sm flex-grow">
@@ -110,7 +110,7 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[12px]">add</span>Add a page
       </a>
       <a href="#/contributing"
-         class="text-outline hover:text-tertiary text-[10px] font-label uppercase tracking-widest flex items-center gap-1">
+         class="text-outline hover:text-secondary text-[10px] font-label uppercase tracking-widest flex items-center gap-1">
         <span class="material-symbols-outlined text-[12px]">help</span>How to contribute
       </a>
     </div>
@@ -143,8 +143,8 @@ tailwind.config = {
       <footer class="px-6 md:px-8 pb-6 text-[10px] text-outline font-label uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-1">
         <span id="pageUpdated">Student-built · not official NWU content</span>
         <span id="pageCats"></span>
-        <a class="hover:text-tertiary" href="https://efundihax.github.io" target="_blank" rel="noopener">Powered by eFundiHax ↗</a>
-        <a class="hover:text-tertiary" id="historyLink" href="#" target="_blank" rel="noopener">Page history ↗</a>
+        <a class="hover:text-secondary" href="https://efundihax.github.io" target="_blank" rel="noopener">Powered by eFundiHax ↗</a>
+        <a class="hover:text-secondary" id="historyLink" href="#" target="_blank" rel="noopener">Page history ↗</a>
       </footer>
     </article>
   </main>

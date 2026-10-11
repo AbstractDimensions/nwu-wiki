@@ -111,7 +111,7 @@
     } else {
       elUpdated.textContent = 'Last verified ' + meta.updated + ' (' + age + 'd ago) · not official NWU content';
     }
-    elCats.innerHTML = 'Category: <a class="hover:text-tertiary" href="#/' + escapeHtml(id) + '">' +
+    elCats.innerHTML = 'Category: <a class="hover:text-secondary" href="#/' + escapeHtml(id) + '">' +
       escapeHtml(meta.category || 'General') + '</a>';
 
     // keep hash printable for sharing
@@ -217,8 +217,8 @@
 
   function stubRibbon() {
     return '<div class="mt-8 bevel-out bg-surface-container p-4 text-xs text-outline font-body">' +
-      '<span class="material-symbols-outlined text-tertiary text-sm align-middle">construction</span> ' +
-      'This page is a <strong class="text-tertiary">stub</strong> — it exists so you can expand it. ' +
+      '<span class="material-symbols-outlined text-secondary text-sm align-middle">construction</span> ' +
+      'This page is a <strong class="text-secondary">stub</strong> — it exists so you can expand it. ' +
       'Click <em>Edit page</em> to add what you know.</div>';
   }
 
