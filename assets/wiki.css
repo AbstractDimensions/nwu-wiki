@@ -110,7 +110,7 @@
 
 /* ===== Wikipedia-layout: tabs ===== */
 .wiki-tabs {
-  display: flex; gap: 2px; padding: 0 1.5rem;
+  display: flex; flex-wrap: wrap; gap: 2px; padding: 0 1.5rem;
   background: #201f1f; border-bottom: 1px solid #4c4453;
 }
 .wiki-tab {

@@ -70,3 +70,11 @@ What was said vs assumed:
 - Cloudflare Worker vs Apps Script final call (primary: Worker).
 - Repo transfer to the eFundiHax org still pending (needs org owner).
 - Cross-link eFundiHax hub ↔ wiki footers.
+
+## Visual language (locked 2026-10-11, user-approved refinements)
+
+- Shell centers at max 1440px (`mx-auto`); article column max 1024px.
+- Orange (#ffb77a) is reserved exclusively for page-to-page interlinks
+  (no underline, including TOC and footer category links). External links
+  stay purple + underlined. Nothing else uses orange.
+- Infobox photo slot doubles as the "add a photo" first-contribution CTA.
