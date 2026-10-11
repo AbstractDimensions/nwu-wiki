@@ -1,0 +1,122 @@
+/* NWU Wiki — styles matching the eFundiHax dark design language */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.bevel-out {
+  border-top:    1px solid #4c4453;
+  border-left:   1px solid #4c4453;
+  border-bottom: 2px solid #0e0e0e;
+  border-right:  2px solid #0e0e0e;
+}
+.bevel-in {
+  border-top:    2px solid #0e0e0e;
+  border-left:   2px solid #0e0e0e;
+  border-bottom: 1px solid #4c4453;
+  border-right:  1px solid #4c4453;
+}
+.panel-header-tab {
+  background:  #6b3d8f;
+  box-shadow:  inset 1px 1px 0px rgba(255,255,255,0.2),
+               inset -1px -1px 0px rgba(0,0,0,0.4);
+}
+.badge-soon {
+  background: #201f1f;
+  color: #988d9e;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  text-transform: uppercase;
+  font-family: 'Space Grotesk', sans-serif;
+}
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: #131313; }
+::-webkit-scrollbar-thumb { background: #353534; }
+
+/* ===== Rendered markdown ===== */
+#pageBody h1, #pageBody h2, #pageBody h3, #pageBody h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  color: #e5e2e1;
+  line-height: 1.2;
+  margin: 1.4em 0 0.5em;
+}
+#pageBody h1 { font-size: 1.6rem; letter-spacing: -0.01em; }
+#pageBody h2 {
+  font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: #dbb9fa; border-bottom: 1px solid #4c4453; padding-bottom: 0.35em;
+}
+#pageBody h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: #ffb77a; }
+#pageBody p  { margin: 0.7em 0; line-height: 1.65; color: #c9c6c4; font-size: 0.9rem; }
+#pageBody a  { color: #dbb9fa; text-decoration: underline; text-underline-offset: 2px; }
+#pageBody a:hover { color: #f0dbff; }
+#pageBody strong { color: #e5e2e1; }
+#pageBody ul, #pageBody ol { margin: 0.7em 0 0.7em 1.3em; color: #c9c6c4; font-size: 0.9rem; }
+#pageBody li { margin: 0.3em 0; line-height: 1.6; }
+#pageBody ul { list-style: square; }
+#pageBody blockquote {
+  border-left: 3px solid #6b3d8f; background: #201f1f;
+  margin: 1em 0; padding: 0.6em 1em; color: #988d9e; font-size: 0.85rem;
+}
+#pageBody code {
+  font-family: ui-monospace, monospace; font-size: 0.85em;
+  background: #2a2a2a; padding: 0.1em 0.35em; color: #ffdcc2;
+}
+#pageBody pre {
+  background: #0e0e0e; border: 1px solid #4c4453;
+  padding: 0.9em 1em; overflow-x: auto; margin: 1em 0;
+}
+#pageBody pre code { background: none; padding: 0; color: #e5e2e1; }
+#pageBody table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.85rem; }
+#pageBody th {
+  background: #2a2a2a; color: #dbb9fa; text-align: left;
+  font-family: 'Space Grotesk', sans-serif; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0.5em 0.7em; border: 1px solid #4c4453;
+}
+#pageBody td { padding: 0.5em 0.7em; border: 1px solid #353534; color: #c9c6c4; vertical-align: top; }
+#pageBody tr:nth-child(even) td { background: #1a1919; }
+#pageBody hr { border: none; border-top: 1px solid #4c4453; margin: 1.6em 0; }
+#pageBody img { max-width: 100%; height: auto; }
+
+/* ===== Nav ===== */
+.nav-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 0.6rem; color: #c9c6c4; font-size: 0.8rem;
+  border-left: 2px solid transparent; cursor: pointer;
+}
+.nav-item:hover { background: #2a2a2a; color: #e5e2e1; }
+.nav-item.active { background: #2a2a2a; color: #f0dbff; border-left-color: #6b3d8f; }
+.nav-cat {
+  font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em; color: #988d9e;
+  padding: 0.9em 0.6em 0.3em;
+}
+.nav-item .material-symbols-outlined { font-size: 15px; color: #988d9e; }
+.nav-item.active .material-symbols-outlined { color: #dbb9fa; }
+
+/* ===== Callouts produced from > [!note] style blockquotes ===== */
+#pageBody blockquote.wiki-note   { border-left-color: #6b3d8f; }
+#pageBody blockquote.wiki-warn   { border-left-color: #ffb77a; }
+#pageBody blockquote.wiki-tip    { border-left-color: #6fcf6f; }
+
+/* search results */
+.search-hit {
+  display: block; padding: 0.45rem 0.6rem; font-size: 0.78rem;
+  color: #c9c6c4; cursor: pointer; border-left: 2px solid transparent;
+}
+.search-hit:hover, .search-hit.active { background: #2a2a2a; color: #f0dbff; border-left-color: #ffb77a; }
+
+/* stub ribbon */
+.stub-ribbon {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #683700; color: #ffdcc2; font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+}
+
+@media print {
+  header, aside, #historyLink, .no-print { display: none !important; }
+  #pageBody { color: #000; }
+}

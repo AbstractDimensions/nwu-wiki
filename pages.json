@@ -1,0 +1,79 @@
+{
+  "wiki": "NWU Wiki",
+  "updated": "2026-10-11",
+  "pages": [
+    {
+      "id": "home",
+      "title": "Home",
+      "category": "Start here",
+      "icon": "home",
+      "file": "home.md",
+      "desc": "What this wiki is and how to use it"
+    },
+    {
+      "id": "getting-started",
+      "title": "First Weeks Guide",
+      "category": "Start here",
+      "icon": "school",
+      "file": "getting-started.md",
+      "desc": "eFundi login, eFundiHax setup, wifi, student card, where everything lives",
+      "keywords": ["efundi", "login", "install", "tampermonkey", "wifi", "student card", "first year"]
+    },
+    {
+      "id": "modules",
+      "title": "Modules & Synced Content",
+      "category": "Studies",
+      "icon": "menu_book",
+      "file": "modules.md",
+      "desc": "Live list of every module synced by eFundiHax, with notes per faculty",
+      "keywords": ["modules", "courses", "efundihax", "notes", "notebooklm"]
+    },
+    {
+      "id": "exams",
+      "title": "Exams, Tests & Deadlines",
+      "category": "Studies",
+      "icon": "event",
+      "file": "exams.md",
+      "desc": "How assessment dates flow from eFundi to your calendar",
+      "keywords": ["exam", "test", "quiz", "deadline", "calendar", "timetable"]
+    },
+    {
+      "id": "bursaries",
+      "title": "Bursaries Guide",
+      "category": "Money",
+      "icon": "savings",
+      "file": "bursaries.md",
+      "desc": "How SA bursaries work, what to apply for, and common traps",
+      "keywords": ["bursary", "scholarship", "nsfas", "isfap", "funding", "money", "apply"]
+    },
+    {
+      "id": "bursary-directory",
+      "title": "Bursary Directory",
+      "category": "Money",
+      "icon": "list",
+      "file": "bursary-directory.md",
+      "stub": true,
+      "desc": "The big list of organisations that fund students — expand the ones you know",
+      "keywords": ["bursary", "list", "directory", "companies", "apply"]
+    },
+    {
+      "id": "campus",
+      "title": "Campus Life",
+      "category": "Campus",
+      "icon": "location_city",
+      "file": "campus.md",
+      "stub": true,
+      "desc": "Residences, venues, parking, printing, sport — written by students",
+      "keywords": ["campus", "potchefstroom", "residence", "parking", "printing", "sport", "food"]
+    },
+    {
+      "id": "contributing",
+      "title": "How to Contribute",
+      "category": "About",
+      "icon": "edit_note",
+      "file": "contributing.md",
+      "desc": "Add or fix a page from your phone or laptop in 2 minutes — no git needed",
+      "keywords": ["edit", "contribute", "github", "pull request", "add page"]
+    }
+  ]
+}
