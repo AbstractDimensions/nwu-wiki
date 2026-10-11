@@ -18,6 +18,11 @@
   var elBody = document.getElementById('pageBody');
   var elEdit = document.getElementById('editBtn');
   var elHistory = document.getElementById('historyLink');
+  var elTabArticle = document.getElementById('tabArticle');
+  var elTabEdit = document.getElementById('tabEdit');
+  var elTabHistory = document.getElementById('tabHistory');
+  var elUpdated = document.getElementById('pageUpdated');
+  var elCats = document.getElementById('pageCats');
   var navEl = document.getElementById('wikiNav');
   var navMobileEl = document.getElementById('wikiNavMobile');
   var searchEl = document.getElementById('wikiSearch');
@@ -84,7 +89,7 @@
   /* ---------- page rendering ---------- */
   function loadPage(id) {
     var meta = pagesIndex.filter(function (p) { return p.id === id; })[0];
-    if (!meta) { renderNotFound(id); return; }
+    if (!meta || !meta.file) { renderNotFound(id); return; }
     currentPage = id;
     markActiveNav();
 
@@ -93,11 +98,26 @@
     elIcon.textContent = meta.icon || 'article';
     elEdit.href = githubUrl('pages/' + meta.file, 'edit');
     elHistory.href = githubUrl('pages/' + meta.file, 'commits');
+    elTabArticle.href = '#/' + id;
+    elTabArticle.setAttribute('aria-current', 'page');
+    elTabEdit.href = githubUrl('pages/' + meta.file, 'edit');
+    elTabHistory.href = githubUrl('pages/' + meta.file, 'commits');
     document.title = meta.title + ' — NWU Wiki';
 
+    // Footer: freshness stamp + category links (complaint #1: stale pages).
+    var age = ageDaysOf(meta.updated);
+    if (age === null) {
+      elUpdated.textContent = 'Verification date unknown · not official NWU content';
+    } else {
+      elUpdated.textContent = 'Last verified ' + meta.updated + ' (' + age + 'd ago) · not official NWU content';
+    }
+    elCats.innerHTML = 'Category: <a class="hover:text-tertiary" href="#/' + escapeHtml(id) + '">' +
+      escapeHtml(meta.category || 'General') + '</a>';
+
     // keep hash printable for sharing
-    if (location.hash !== '#/' + id) {
-      history.replaceState(null, '', '#/' + id);
+    var wantHash = pendingAnchor ? '#/' + id + '#' + pendingAnchor : '#/' + id;
+    if (location.hash !== wantHash) {
+      history.replaceState(null, '', wantHash);
     }
 
     fetch('pages/' + encodeURIComponent(meta.file), { cache: 'no-store' })
@@ -108,9 +128,10 @@
       .then(function (md) {
         var raw = marked.parse(md);
         var clean = window.DOMPurify ? DOMPurify.sanitize(raw) : raw;
-        elBody.innerHTML = clean + (meta.stub ? stubRibbon() : '');
+        elBody.innerHTML = infoboxHtml(meta) + staleHtml(meta) + sampleHtml(meta) + clean +
+          (meta.stub ? stubRibbon() : '');
         postProcess();
-        window.scrollTo(0, 0);
+        if (pendingAnchor) scrollToAnchor(); else window.scrollTo(0, 0);
       })
       .catch(function (e) {
         elBody.innerHTML = '<div class="text-error text-sm font-label uppercase tracking-widest">' +
@@ -118,6 +139,73 @@
           '<p class="text-outline normal-case tracking-normal font-body mt-2 text-xs">' +
           'If this page was just added, wait a minute for GitHub Pages to rebuild.</p></div>';
       });
+  }
+
+  /* Freshness helpers: null = unknown/invalid date, never NaN. */
+  function ageDaysOf(updated) {
+    if (!updated) return null;
+    var t = new Date(updated + 'T00:00:00Z').getTime();
+    if (isNaN(t)) return null;
+    return Math.floor((Date.now() - t) / 86400000);
+  }
+  /* Top-right subject box (Wikipedia layout). Data comes from pages.json so
+   * editors never touch markup for it — prime directive. Missing photo
+   * renders as an "add a photo" invitation: the easiest first contribution. */
+  function infoboxHtml(meta) {
+    if (!meta.infobox) return '';
+    var ib = meta.infobox;
+    var photo = ib.image
+      ? '<img class="ib-photo" src="' + escapeHtml(ib.image) + '" alt="' + escapeHtml(meta.title) + '" loading="lazy">'
+      : '<a class="ib-photo-empty" href="' + escapeHtml(githubUrl('pages/' + meta.file, 'edit')) + '" target="_blank" rel="noopener">' +
+        '<span class="material-symbols-outlined">add_a_photo</span>No photo yet — add one</a>';
+    var rows = (ib.fields || []).map(function (f) {
+      if (!Array.isArray(f)) return '';
+      return '<div class="ib-row"><div class="ib-key">' + escapeHtml(f[0] || '') + '</div>' +
+        '<div class="ib-val">' + escapeHtml(f[1] || '') + '</div></div>';
+    }).join('');
+    return '<aside class="wiki-infobox"><div class="ib-title">' + escapeHtml(meta.title) + '</div>' +
+      photo +
+      (ib.caption ? '<div class="ib-caption">' + escapeHtml(ib.caption) + '</div>' : '') +
+      rows + '</aside>';
+  }
+
+  /* Staleness banner (complaint #1). Anything unverified for 180+ days says so. */
+  function staleHtml(meta) {
+    var age = ageDaysOf(meta.updated);
+    if (age === null || age < 180) return '';
+    return '<div class="stale-ribbon">This page was last verified ' + escapeHtml(meta.updated) +
+      ' — details may be outdated. If you can confirm or fix something, hit <strong>Edit</strong> above.</div>';
+  }
+
+  function sampleHtml(meta) {
+    if (!meta.sample) return '';
+    return '<div class="sample-wrap"><span class="sample-ribbon">Sample page — layout demo, content is illustrative</span></div>';
+  }
+
+  /* Table of contents from h2/h3 (Wikipedia layout). Skipped on short pages.
+   * Links are page-scoped (#/id#sec-N) so reload/bookmark keeps its context. */
+  var pendingAnchor = null;
+  function buildToc() {
+    var heads = elBody.querySelectorAll('h2, h3');
+    if (heads.length < 3) return;
+    var items = [];
+    var n2 = 0, n3 = 0, scope = currentPage || 'home';
+    Array.prototype.forEach.call(heads, function (h) {
+      var num;
+      if (h.tagName === 'H2') { n2++; n3 = 0; num = String(n2); }
+      else { n3++; num = (n2 || 1) + '.' + n3; }
+      var id = 'sec-' + num;
+      h.id = id;
+      items.push('<li class="' + (h.tagName === 'H3' ? 'toc-h3' : '') + '"><span class="toc-num">' +
+        escapeHtml(num) + '</span><a href="#/' + escapeHtml(scope) + '#' + id + '">' +
+        escapeHtml(h.textContent) + '</a></li>');
+    });
+    var nav = document.createElement('nav');
+    nav.className = 'wiki-toc';
+    nav.innerHTML = '<div class="toc-title">Contents</div><ol>' + items.join('') + '</ol>';
+    var h1 = elBody.querySelector('h1');
+    if (h1 && h1.nextSibling) elBody.insertBefore(nav, h1.nextSibling);
+    else elBody.insertBefore(nav, elBody.firstChild);
   }
 
   function stubRibbon() {
@@ -135,8 +223,9 @@
       '<p class="text-outline text-xs mt-2">Pick a page from the sidebar, or <a class="text-secondary underline" href="#/home">go home</a>.</p>';
   }
 
-  /* Enhance rendered HTML: callout styling + external link behaviour + live hooks */
+  /* Enhance rendered HTML: callout styling + external link behaviour + TOC + live hooks */
   function postProcess() {
+    buildToc();
     Array.prototype.forEach.call(elBody.querySelectorAll('blockquote'), function (bq) {
       var t = (bq.textContent || '').toLowerCase();
       if (t.indexOf('[!warning]') === 0 || t.indexOf('[!warn]') === 0) bq.classList.add('wiki-warn');
@@ -160,6 +249,7 @@
           var rows = list.map(function (w) {
             var name = w.title || w.slug;
             var link = w.efundiUrl || (w.siteId ? 'https://efundi.nwu.ac.za/portal/site/' + w.siteId : '');
+            if (link && !/^https:\/\//i.test(link)) link = ''; // never trust exotic schemes
             var dash = 'https://efundihax.github.io/worksite.html?site=' + encodeURIComponent(w.slug);
             return '<tr><td><strong>' + escapeHtml(name) + '</strong></td>' +
               '<td><code>' + escapeHtml(w.slug) + '</code></td>' +
@@ -202,8 +292,37 @@
   }
 
   /* ---------- router ---------- */
+  function scrollToAnchor(which) {
+    var anchor = which || pendingAnchor;
+    pendingAnchor = null;
+    if (!anchor) return;
+    var el = document.getElementById(anchor);
+    if (el && el.scrollIntoView) el.scrollIntoView();
+  }
+
   function route() {
-    var id = (location.hash || '').replace(/^#\/?/, '') || 'home';
+    var hash = location.hash || '';
+    var m = hash.match(/^#\/([^#]+)#(.+)$/);
+    if (m) { // page-scoped anchor (#/id#sec-N): load page, then jump
+      pendingAnchor = m[2];
+      if (m[1] === currentPage) { scrollToAnchor(); return; }
+      bootPage(m[1]);
+      return;
+    }
+    if (hash.indexOf('#sec-') === 0) { // bare anchor: keep current page context
+      if (currentPage) {
+        history.replaceState(null, '', '#/' + currentPage + hash);
+        scrollToAnchor(hash.slice(1));
+      } else {
+        bootPage('home'); // fresh load with no page context: never leave blank
+      }
+      return;
+    }
+    pendingAnchor = null;
+    bootPage(hash.replace(/^#\/?/, '') || 'home');
+  }
+
+  function bootPage(id) {
     if (!pagesIndex.length) {
       loadIndex().then(function () { loadPage(id); });
     } else {
@@ -212,6 +331,9 @@
   }
 
   window.addEventListener('hashchange', route);
+  // Seed tab hrefs so early clicks never hit a placeholder '#'.
+  elTabEdit.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME;
+  elTabHistory.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME + '/commits/main';
   loadIndex().then(route);
   initSearch();
 })();

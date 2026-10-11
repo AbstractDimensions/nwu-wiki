@@ -8,7 +8,8 @@
       "category": "Start here",
       "icon": "home",
       "file": "home.md",
-      "desc": "What this wiki is and how to use it"
+      "desc": "What this wiki is and how to use it",
+      "updated": "2026-10-11"
     },
     {
       "id": "getting-started",
@@ -17,7 +18,16 @@
       "icon": "school",
       "file": "getting-started.md",
       "desc": "eFundi login, eFundiHax setup, wifi, student card, where everything lives",
-      "keywords": ["efundi", "login", "install", "tampermonkey", "wifi", "student card", "first year"]
+      "keywords": [
+        "efundi",
+        "login",
+        "install",
+        "tampermonkey",
+        "wifi",
+        "student card",
+        "first year"
+      ],
+      "updated": "2026-10-11"
     },
     {
       "id": "modules",
@@ -26,7 +36,14 @@
       "icon": "menu_book",
       "file": "modules.md",
       "desc": "Live list of every module synced by eFundiHax, with notes per faculty",
-      "keywords": ["modules", "courses", "efundihax", "notes", "notebooklm"]
+      "keywords": [
+        "modules",
+        "courses",
+        "efundihax",
+        "notes",
+        "notebooklm"
+      ],
+      "updated": "2026-10-11"
     },
     {
       "id": "exams",
@@ -35,7 +52,15 @@
       "icon": "event",
       "file": "exams.md",
       "desc": "How assessment dates flow from eFundi to your calendar",
-      "keywords": ["exam", "test", "quiz", "deadline", "calendar", "timetable"]
+      "keywords": [
+        "exam",
+        "test",
+        "quiz",
+        "deadline",
+        "calendar",
+        "timetable"
+      ],
+      "updated": "2026-10-11"
     },
     {
       "id": "bursaries",
@@ -44,7 +69,16 @@
       "icon": "savings",
       "file": "bursaries.md",
       "desc": "How SA bursaries work, what to apply for, and common traps",
-      "keywords": ["bursary", "scholarship", "nsfas", "isfap", "funding", "money", "apply"]
+      "keywords": [
+        "bursary",
+        "scholarship",
+        "nsfas",
+        "isfap",
+        "funding",
+        "money",
+        "apply"
+      ],
+      "updated": "2026-10-11"
     },
     {
       "id": "bursary-directory",
@@ -54,7 +88,14 @@
       "file": "bursary-directory.md",
       "stub": true,
       "desc": "The big list of organisations that fund students — expand the ones you know",
-      "keywords": ["bursary", "list", "directory", "companies", "apply"]
+      "keywords": [
+        "bursary",
+        "list",
+        "directory",
+        "companies",
+        "apply"
+      ],
+      "updated": "2026-10-11"
     },
     {
       "id": "campus",
@@ -64,7 +105,16 @@
       "file": "campus.md",
       "stub": true,
       "desc": "Residences, venues, parking, printing, sport — written by students",
-      "keywords": ["campus", "potchefstroom", "residence", "parking", "printing", "sport", "food"]
+      "keywords": [
+        "campus",
+        "potchefstroom",
+        "residence",
+        "parking",
+        "printing",
+        "sport",
+        "food"
+      ],
+      "updated": "2026-10-11"
     },
     {
       "id": "contributing",
@@ -73,7 +123,163 @@
       "icon": "edit_note",
       "file": "contributing.md",
       "desc": "Add or fix a page from your phone or laptop in 2 minutes — no git needed",
-      "keywords": ["edit", "contribute", "github", "pull request", "add page"]
+      "keywords": [
+        "edit",
+        "contribute",
+        "github",
+        "pull request",
+        "add page"
+      ],
+      "updated": "2026-10-11"
+    },
+    {
+      "id": "lecturer-naledi-khumalo",
+      "title": "Dr Naledi Khumalo (sample)",
+      "category": "Lecturers",
+      "icon": "person",
+      "file": "lecturer-naledi-khumalo.md",
+      "desc": "Sample lecturer page: classes, consultation hours, assessment style",
+      "keywords": [
+        "lecturer",
+        "cmpg",
+        "programming",
+        "consultation"
+      ],
+      "sample": true,
+      "updated": "2026-10-11",
+      "infobox": {
+        "image": "assets/sample-photo.svg",
+        "caption": "Sample portrait placeholder — replace with a real photo",
+        "fields": [
+          [
+            "Faculty",
+            "Natural and Agricultural Sciences (sample — verify)"
+          ],
+          [
+            "Campus",
+            "Potchefstroom (sample — verify)"
+          ],
+          [
+            "Office",
+            "Building G20, Room 114 (sample — verify)"
+          ],
+          [
+            "Email",
+            "via eFundi Messages (sample — verify)"
+          ],
+          [
+            "Classes",
+            "CMPG 111 · CMPG 121 · CMPG 211 (sample — verify)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "place-student-centre",
+      "title": "Student Centre (sample)",
+      "category": "Places",
+      "icon": "restaurant",
+      "file": "place-student-centre.md",
+      "desc": "Sample place page: food, parking, best times",
+      "keywords": [
+        "food",
+        "parking",
+        "potchefstroom",
+        "centre"
+      ],
+      "sample": true,
+      "updated": "2026-10-11",
+      "infobox": {
+        "caption": "Main food-and-services building, Potchefstroom (sample)",
+        "fields": [
+          [
+            "Campus",
+            "Potchefstroom (sample — verify)"
+          ],
+          [
+            "Building",
+            "Central walkway, north side (sample — verify)"
+          ],
+          [
+            "Hours",
+            "Mon–Fri 07:30–17:00, see article (sample — verify)"
+          ],
+          [
+            "Parking",
+            "Front lot fills by 08:15 (sample — verify)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "module-ingm122",
+      "title": "INGM 122 (sample)",
+      "category": "Modules",
+      "icon": "draw",
+      "file": "module-ingm122.md",
+      "desc": "Sample module page: kit list, assessment, traps",
+      "keywords": [
+        "ingm122",
+        "engineering",
+        "drawing",
+        "graphics"
+      ],
+      "sample": true,
+      "updated": "2026-10-11",
+      "infobox": {
+        "caption": "Engineering Graphics and Design",
+        "fields": [
+          [
+            "Code",
+            "INGM 122"
+          ],
+          [
+            "Faculty",
+            "Engineering"
+          ],
+          [
+            "Credits",
+            "12 (illustrative)"
+          ],
+          [
+            "Synced notes",
+            "eFundiHax hub"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "wildcat",
+      "title": "Wildcat (sample)",
+      "category": "General",
+      "icon": "local_drink",
+      "file": "wildcat.md",
+      "desc": "Sample one-off page: the unofficial energy drink",
+      "keywords": [
+        "drink",
+        "wildcat",
+        "caffeine",
+        "tuck shop"
+      ],
+      "sample": true,
+      "updated": "2025-06-01",
+      "infobox": {
+        "caption": "Unofficial drink of the all-nighter (sample)",
+        "fields": [
+          [
+            "Type",
+            "Canned energy drink"
+          ],
+          [
+            "Variants",
+            "Original, sugar-free (unconfirmed)"
+          ],
+          [
+            "Found at",
+            "Tuck shops, vending machines (sample — verify)"
+          ]
+        ]
+      }
     }
   ]
 }

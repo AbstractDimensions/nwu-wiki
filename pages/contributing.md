@@ -56,7 +56,19 @@ Request** and someone will merge it.
 - Dates with years: "applications opened in April 2026", not "recently".
 - Mark claims you're unsure about with *(unconfirmed — please check)*.
 - Never paste private info: student numbers, marks, inboxes, phone numbers.
+- Lecturer pages: business contact info already published on the NWU site
+  or eFundi only (office, official email). Never cell numbers, home
+  addresses, or anything from a private conversation.
 - Tables and short bullets beat walls of text on a phone.
+
+## How a page is stored (two files, one page)
+
+Each wiki page is two things: the article text in `pages/*.md` (what the
+**Edit** button opens) and its purple info box in `pages.json` (open that
+file, pencil icon, find your page, edit `infobox`). Changing box facts
+means editing `pages.json` too — say so in your commit message. A one-form
+editor that does both at once is planned; until then, this section is the
+manual.
 
 ## What to work on
 
