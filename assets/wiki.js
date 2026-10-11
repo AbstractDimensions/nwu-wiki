@@ -203,8 +203,15 @@
     var nav = document.createElement('nav');
     nav.className = 'wiki-toc';
     nav.innerHTML = '<div class="toc-title">Contents</div><ol>' + items.join('') + '</ol>';
-    var h1 = elBody.querySelector('h1');
-    if (h1 && h1.nextSibling) elBody.insertBefore(nav, h1.nextSibling);
+    // Wikipedia placement: after the lead paragraph (first P after H1),
+    // never wedged between title and intro.
+    var anchor = elBody.querySelector('h1');
+    if (anchor) {
+      var sib = anchor.nextElementSibling;
+      while (sib && sib.tagName !== 'P') sib = sib.nextElementSibling;
+      if (sib) anchor = sib;
+    }
+    if (anchor && anchor.nextSibling) elBody.insertBefore(nav, anchor.nextSibling);
     else elBody.insertBefore(nav, elBody.firstChild);
   }
 
@@ -227,10 +234,24 @@
   function postProcess() {
     buildToc();
     Array.prototype.forEach.call(elBody.querySelectorAll('blockquote'), function (bq) {
-      var t = (bq.textContent || '').toLowerCase();
-      if (t.indexOf('[!warning]') === 0 || t.indexOf('[!warn]') === 0) bq.classList.add('wiki-warn');
-      else if (t.indexOf('[!tip]') === 0) bq.classList.add('wiki-tip');
+      var t = (bq.textContent || '');
+      var tag = (t.match(/^\s*\[!(note|tip|warning|warn)\]/i) || [])[1] || '';
+      tag = tag.toLowerCase();
+      if (tag === 'warning' || tag === 'warn') bq.classList.add('wiki-warn');
+      else if (tag === 'tip') bq.classList.add('wiki-tip');
       else bq.classList.add('wiki-note');
+      // Strip the raw [!tag] marker so readers never see markdown.
+      // (First text node is often inter-tag whitespace — scan until hit.)
+      try {
+        var walker = document.createTreeWalker(bq, NodeFilter.SHOW_TEXT, null, false);
+        var node;
+        while ((node = walker.nextNode())) {
+          if (/\[!(note|tip|warning|warn)\]/i.test(node.nodeValue)) {
+            node.nodeValue = node.nodeValue.replace(/^\s*\[!(note|tip|warning|warn)\]\s*/i, '');
+            break;
+          }
+        }
+      } catch (e) { /* cosmetic only */ }
     });
     Array.prototype.forEach.call(elBody.querySelectorAll('a[href^="http"]'), function (a) {
       a.target = '_blank';

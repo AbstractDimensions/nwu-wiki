@@ -183,11 +183,11 @@
 /* ===== Freshness: stale banner + sample ribbon ===== */
 #pageBody::after { content: ""; display: block; clear: both; }
 .stale-ribbon {
-  clear: both;
+  overflow: hidden;
   background: #2a1f0e; border-left: 3px solid #ffb77a;
   color: #ffdcc2; font-size: 0.82rem; padding: 0.7em 1em; margin-bottom: 1.2em;
 }
-.sample-wrap { clear: both; }
+.sample-wrap { overflow: hidden; }
 .sample-ribbon {
   display: inline-block; background: #563a72; color: #f0dbff;
   font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700;

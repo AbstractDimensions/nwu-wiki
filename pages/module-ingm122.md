@@ -47,6 +47,27 @@ shield. Buy once in week 1 — the queue at the campus shop in week 3 is brutal.
 2. Redraw your worst sheet each week — the exam repeats practical tasks.
 3. Learn the dimensioning rules by heart; they're free marks or free losses.
 
+## Lecturers
+
+- [Dr Naledi Khumalo](#/lecturer-naledi-khumalo) — first-year graphics
+  coordination (sample link: shows how module and lecturer pages interlink;
+  verify the real lecturer before trusting this)
+
+## Links
+
+- [Synced INGM122 page on the eFundiHax hub](https://efundihax.github.io/worksite.html?site=ingm122-2026) — announcements, calendar, Drive files
+- [eFundi portal](https://efundi.nwu.ac.za/portal) — log in, then open INGM122 from your tab bar
+
+## Resources
+
+- **Master doc** — the full synced module text as one Google Doc: open the
+  hub link above → Drive Preview → `(MASTER) INGM122-2026`. Hand it to
+  NotebookLM for Q&A over the whole module.
+- **Schedule sheet** — same place, `(SCHEDULE) INGM122-2026`: every test and
+  deadline in one table.
+- **Study guide** — the PDF on eFundi under Resources (sample: confirm the
+  exact filename for the current year).
+
 ## Known traps
 
 - Third-angle vs first-angle symbol mix-ups in test 1, every year.
