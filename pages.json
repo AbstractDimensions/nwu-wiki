@@ -318,6 +318,21 @@
           ]
         ]
       }
+    },
+    {
+      "id": "category-templates",
+      "title": "Category Templates",
+      "category": "Guides",
+      "icon": "dashboard",
+      "file": "category-templates.md",
+      "desc": "Default infobox + sections per category (the template contract)",
+      "keywords": [
+        "template",
+        "category",
+        "sections",
+        "infobox"
+      ],
+      "updated": "2026-10-12"
     }
   ]
 }
