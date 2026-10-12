@@ -164,7 +164,7 @@
 
 /* ===== Wikipedia-layout: table of contents ===== */
 #pageBody .toc-flash {
-  background: rgba(255, 183, 122, 0.25);
+  background: rgba(255, 183, 122, 0.42);
   border-radius: 2px;
 }
 .wiki-toc {

@@ -356,14 +356,14 @@
     if (step === 0 || step === 2) {
       flashRange.forEach(function (x) { x.style.transition = ''; });
       flashRange.forEach(function (x) { x.classList.add('toc-flash'); });
-      flashTimer = setTimeout(function () { flashPulse(step + 1); }, 750);
+      flashTimer = setTimeout(function () { flashPulse(step + 1); }, 650);
     } else if (step === 1) {
-      flashRange.forEach(function (x) { x.style.transition = 'background 0.6s ease-out'; });
+      flashRange.forEach(function (x) { x.style.transition = 'background 0.35s ease-out'; });
       void elBody.offsetHeight; // reflow so the fade animates
       flashRange.forEach(function (x) { x.classList.remove('toc-flash'); });
-      flashTimer = setTimeout(function () { flashPulse(2); }, 700);
+      flashTimer = setTimeout(function () { flashPulse(2); }, 600);
     } else {
-      flashRange.forEach(function (x) { x.style.transition = 'background 0.9s ease-out'; });
+      flashRange.forEach(function (x) { x.style.transition = 'background 0.5s ease-out'; });
       void elBody.offsetHeight;
       flashRange.forEach(function (x) { x.classList.remove('toc-flash'); });
       var done = flashRange;
@@ -371,7 +371,7 @@
       flashTimer = setTimeout(function () {
         flashTimer = null;
         done.forEach(function (x) { x.style.transition = ''; });
-      }, 1000);
+      }, 600);
     }
   }
   function scrollToAnchor(which) { jumpToSection(which); }
