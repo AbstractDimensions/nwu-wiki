@@ -18,14 +18,15 @@
   var dirty = false;
   var currentSha = null;
 
-  // Save backend (spec Section 3). Override without code changes:
-  //   wiki URL ?save=https://<worker>.workers.dev&key=<write-key>
-  // Until connected, Save falls back to copy + GitHub editor.
+  // Save backend (spec Section 3): Apps Script publisher running as
+  // efundihax@gmail.com. Override without code changes:
+  //   wiki URL ?save=https://other-exec...&key=<write-key>
+  var SAVE_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbw2iHfyHXs-q44aXPaq_4dmgOrskKgL19qt_7IlhDj2jJcP0shjkBAOYpWyAoN_ev9Y/exec';
   var SAVE_URL = null, WRITE_KEY = 'nwu-wiki-write';
   try {
     var _q = new URLSearchParams(location.search);
     if (_q.get('save')) { SAVE_URL = _q.get('save'); localStorage.setItem('nwu_save_url', SAVE_URL); }
-    else { SAVE_URL = localStorage.getItem('nwu_save_url') || ''; }
+    else { SAVE_URL = localStorage.getItem('nwu_save_url') || SAVE_URL_DEFAULT; }
     if (_q.get('key')) { WRITE_KEY = _q.get('key'); localStorage.setItem('nwu_write_key', WRITE_KEY); }
     else { WRITE_KEY = localStorage.getItem('nwu_write_key') || WRITE_KEY; }
   } catch (e) { SAVE_URL = ''; }
@@ -270,7 +271,8 @@
   }
 
   function joinSections(secs) {
-    return secs.map(serializeSection).join('\n').replace(/\n{3,}/g, '\n\n').replace(/^\n+/, '');
+    var text = secs.map(serializeSection).join('\n').replace(/\n{3,}/g, '\n\n').replace(/^\n+/, '');
+    return text.replace(/\s+$/, '') + '\n'; // exactly one trailing newline: no spurious diffs
   }
 
   function renderBody() {
