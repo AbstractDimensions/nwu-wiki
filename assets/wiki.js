@@ -243,8 +243,8 @@
       while (sib && sib.tagName !== 'P') sib = sib.nextElementSibling;
       if (sib) anchor = sib;
     }
-    if (anchor && anchor.nextSibling) elBody.insertBefore(nav, anchor.nextSibling);
-    else elBody.insertBefore(nav, elBody.firstChild);
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(nav, anchor.nextSibling);
+    else (elBody.querySelector('#mdContent') || elBody).insertBefore(nav, (elBody.querySelector('#mdContent') || elBody).firstChild);
   }
 
   /* ---------- in-place section editing ---------- */
