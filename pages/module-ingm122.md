@@ -20,6 +20,7 @@ Test Edit
 - **Dimensioning and tolerances** — the part students lose the most marks on
 - **AutoCAD basics** — second half of the semester, lab-based
 
+One-click probe.
 ### The drawing kit
 
 You need your own: A3 drawing board, T-square or drafting machine access,
