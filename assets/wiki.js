@@ -496,7 +496,7 @@
       body: JSON.stringify({
         action: 'save_wiki_page',
         key: WRITE_KEY,
-        file: currentMeta.file,
+        file: 'pages/' + currentMeta.file,
         content: content,
         message: 'Update ' + currentMeta.title,
         nickname: nick,
