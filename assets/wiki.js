@@ -726,9 +726,9 @@
       // Create a minimal meta for the new page so renderBody doesn't fail
       currentMeta = {
         title: title,
-        category: cat,
+        category: createCat,
         file: 'pages/' + slug + '.md',
-        icon: CREATE_CATEGORIES.find(function(c) { return c.id === cat; })?.icon || 'article',
+        icon: CREATE_CATEGORIES.find(function(c) { return c.id === createCat; })?.icon || 'article',
         updated: new Date().toISOString().split('T')[0],
         infobox: { fields: [] }
       };
