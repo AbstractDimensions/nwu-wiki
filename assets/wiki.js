@@ -112,8 +112,7 @@
           '</a>';
       });
       if (!list.length) {
-        html += '<a class="nav-item nav-empty" target="_blank" rel="noopener" href="' +
-          escapeHtml('https://github.com/' + REPO_OWNER + '/' + REPO_NAME + '/new/main/pages') + '">' +
+        html += '<a class="nav-item nav-empty" href="#" onclick="event.preventDefault();openCreatePage()">' +
           '<span class="material-symbols-outlined">add</span>' +
           '<span class="truncate">Empty — add the first page</span></a>';
       }
