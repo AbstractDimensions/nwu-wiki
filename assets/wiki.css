@@ -163,10 +163,9 @@
 .wiki-infobox .ib-val a { color: #dbb9fa; }
 
 /* ===== Wikipedia-layout: table of contents ===== */
-.toc-flash {
-  background: rgba(255, 183, 122, 0.16);
+#pageBody .toc-flash {
+  background: rgba(255, 183, 122, 0.25);
   border-radius: 2px;
-  transition: background 1.2s ease-out;
 }
 .wiki-toc {
   display: table; min-width: 220px; max-width: 100%;

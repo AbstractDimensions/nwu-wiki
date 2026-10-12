@@ -313,7 +313,29 @@
   }
 
   /* ---------- router ---------- */
+  var flashRange = [];
   var flashTimer = null;
+  function clearFlash() {
+    if (flashTimer) { clearTimeout(flashTimer); flashTimer = null; }
+    flashRange.forEach(function (el) {
+      el.classList.remove('toc-flash');
+      el.style.transition = '';
+    });
+    flashRange = [];
+  }
+  // The clicked heading's whole section: siblings until the next heading
+  // of same-or-higher level (the TOC box itself is skipped).
+  function sectionRange(head) {
+    var range = [head];
+    var stop = (head.tagName === 'H2') ? ['H2'] : ['H2', 'H3'];
+    var sib = head.nextElementSibling;
+    while (sib) {
+      if (stop.indexOf(sib.tagName) !== -1) break;
+      if (!sib.classList || !sib.classList.contains('wiki-toc')) range.push(sib);
+      sib = sib.nextElementSibling;
+    }
+    return range;
+  }
   function jumpToSection(which) {
     var anchor = which || pendingAnchor;
     pendingAnchor = null;
@@ -324,13 +346,33 @@
     // unreliable here — it settled ~800px off-center; the flash below
     // provides the motion cue instead.
     el.scrollIntoView({ block: 'center' });
-    // Flash the heading so the eye lands on it, then fade out.
-    el.classList.add('toc-flash');
-    if (flashTimer) clearTimeout(flashTimer);
-    flashTimer = setTimeout(function () {
-      el.classList.remove('toc-flash');
-      flashTimer = null;
-    }, 1400);
+    // Flash the entire section TWICE: instant on (fast ramp), hold, fade,
+    // repeat, then clean up transitions back to each element's own style.
+    clearFlash();
+    flashRange = sectionRange(el);
+    flashPulse(0);
+  }
+  function flashPulse(step) {
+    if (step === 0 || step === 2) {
+      flashRange.forEach(function (x) { x.style.transition = ''; });
+      flashRange.forEach(function (x) { x.classList.add('toc-flash'); });
+      flashTimer = setTimeout(function () { flashPulse(step + 1); }, 750);
+    } else if (step === 1) {
+      flashRange.forEach(function (x) { x.style.transition = 'background 0.6s ease-out'; });
+      void elBody.offsetHeight; // reflow so the fade animates
+      flashRange.forEach(function (x) { x.classList.remove('toc-flash'); });
+      flashTimer = setTimeout(function () { flashPulse(2); }, 700);
+    } else {
+      flashRange.forEach(function (x) { x.style.transition = 'background 0.9s ease-out'; });
+      void elBody.offsetHeight;
+      flashRange.forEach(function (x) { x.classList.remove('toc-flash'); });
+      var done = flashRange;
+      flashRange = [];
+      flashTimer = setTimeout(function () {
+        flashTimer = null;
+        done.forEach(function (x) { x.style.transition = ''; });
+      }, 1000);
+    }
   }
   function scrollToAnchor(which) { jumpToSection(which); }
 
