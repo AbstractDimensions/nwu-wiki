@@ -734,8 +734,7 @@
       };
       renderBody();
       showToast('Page created! Deploying to live site (1–2 min). You can keep editing here.');
-      console.log('[nwu-wiki] calling showDeployBanner for slug:', slug);
-      showDeployBanner(slug, after);
+      showDeployBanner(slug, null);
     }).catch(function (e) {
       console.error('[nwu-wiki] create FAILED', e);
       showToast('Create failed: ' + String((e && e.message) || e).slice(0, 120));
