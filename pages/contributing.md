@@ -70,6 +70,21 @@ means editing `pages.json` too — say so in your commit message. A one-form
 editor that does both at once is planned; until then, this section is the
 manual.
 
+## Headings and the Contents box
+
+You never build the Contents box yourself — the wiki generates it from your
+headings on every page load:
+
+- `## Section` becomes a numbered top-level entry (`1`, `2`, `3`…).
+- `### Subsection` nests under it (`2.1`, `2.2`…).
+- The box appears automatically after the introduction (first paragraph),
+  but only on pages with 3+ headings — short pages skip it.
+- Clicking an entry jumps to that section, centers it, and flashes it twice.
+
+To keep it clean: one `##` per topic, short titles, don't skip from `##`
+straight to `####`, and put background/context in the intro paragraph
+*before* the first heading so readers land on prose, not the box.
+
 ## What to work on
 
 Pages marked **stub** in the sidebar are intentionally thin — they're the
