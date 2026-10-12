@@ -283,6 +283,74 @@
   margin-bottom: 1em;
 }
 
+/* ===== Deploy banner ===== */
+.deploy-banner {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  max-width: 90vw;
+  width: 480px;
+  background: #201f1f;
+  border: 1px solid #6b3d8f;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  animation: slideUp 0.3s ease-out;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.deploy-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  color: #f0dbff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.deploy-spin {
+  animation: spin 1.2s linear infinite;
+  color: #ffb77a;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.deploy-text {
+  flex: 1;
+  color: #f0dbff;
+}
+.deploy-check, .deploy-continue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.deploy-check {
+  background: #6b3d8f;
+  color: #fff;
+  border: 1px solid #4c4453;
+}
+.deploy-check:hover:not(:disabled) { background: #7f38c3; }
+.deploy-check:disabled { opacity: 0.6; cursor: not-allowed; }
+.deploy-continue {
+  background: transparent;
+  color: #dbb9fa;
+  border: 1px solid #4c4453;
+}
+.deploy-continue:hover { background: #2a2a2a; }
+.deploy-spin {
+  animation: spin 1.2s linear infinite;
+  color: #ffb77a;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 @media (max-width: 640px) {
   .wiki-infobox { float: none; width: 100%; max-width: 100%; margin: 0 0 1.2em; }
   .wiki-toc { display: block; }

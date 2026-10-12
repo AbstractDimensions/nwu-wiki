@@ -714,9 +714,14 @@
         showToast('Create failed: ' + ((res.body && res.body.error) || ('HTTP ' + res.status)));
         return;
       }
-      // Navigate to the new page — it loads with the template pre-filled
-      location.hash = '#/' + slug;
-      showToast('Page created — click any section to start editing.');
+      // Page created successfully! Don't navigate yet — GitHub Pages needs 1–2 min to rebuild.
+      // Keep the editor open and show deployment status. User can keep editing immediately.
+      dirty = false;
+      updateSaveBar();
+      if (elDrawer) elDrawer.hidden = true;
+      renderBody();
+      showToast('Page created! Deploying to live site (1–2 min). You can keep editing here.');
+      showDeployBanner(slug, after);
     }).catch(function (e) {
       console.error('[nwu-wiki] create FAILED', e);
       showToast('Create failed: ' + String((e && e.message) || e).slice(0, 120));
