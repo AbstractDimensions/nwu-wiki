@@ -68,6 +68,7 @@
       .then(function (r) { return r.json(); })
       .then(function (list) {
         pagesIndex = list.pages || [];
+        window.__nwuCategories = list.categories || [];
         renderNav();
       })
       .catch(function (e) {
@@ -88,15 +89,37 @@
       var c = p.category || 'General';
       (cats[c] = cats[c] || []).push(p);
     });
+    // Canonical category order from pages.json; empty ones render dimmed
+    // with an "add the first page" link (prime directive: invite, don't gate).
+    var order = (window.__nwuCategories && window.__nwuCategories.length)
+      ? window.__nwuCategories
+      : Object.keys(cats).map(function (c) { return { id: c, icon: 'folder' }; });
     var html = '';
-    Object.keys(cats).forEach(function (cat) {
-      html += '<div class="nav-cat">' + escapeHtml(cat) + '</div>';
-      cats[cat].forEach(function (p) {
+    order.forEach(function (cat) {
+      var list = cats[cat.id] || [];
+      html += '<div class="nav-cat">' + escapeHtml(cat.id) + '</div>';
+      list.forEach(function (p) {
         html += '<a class="nav-item" data-page="' + escapeHtml(p.id) + '" href="#/' + escapeHtml(p.id) + '">' +
           '<span class="material-symbols-outlined">' + escapeHtml(p.icon || 'article') + '</span>' +
           '<span class="truncate">' + escapeHtml(p.title) + '</span>' +
           (p.stub ? '<span class="badge-soon ml-auto">stub</span>' : '') +
           '</a>';
+      });
+      if (!list.length) {
+        html += '<a class="nav-item nav-empty" target="_blank" rel="noopener" href="' +
+          escapeHtml('https://github.com/' + REPO_OWNER + '/' + REPO_NAME + '/new/main/pages') + '">' +
+          '<span class="material-symbols-outlined">add</span>' +
+          '<span class="truncate">Empty — add the first page</span></a>';
+      }
+    });
+    // Anything filed under an unknown category still shows up (never orphan).
+    Object.keys(cats).forEach(function (c) {
+      if (order.some(function (o) { return o.id === c; })) return;
+      html += '<div class="nav-cat">' + escapeHtml(c) + '</div>';
+      cats[c].forEach(function (p) {
+        html += '<a class="nav-item" data-page="' + escapeHtml(p.id) + '" href="#/' + escapeHtml(p.id) + '">' +
+          '<span class="material-symbols-outlined">' + escapeHtml(p.icon || 'article') + '</span>' +
+          '<span class="truncate">' + escapeHtml(p.title) + '</span></a>';
       });
     });
     navEl.innerHTML = html;

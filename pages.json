@@ -1,11 +1,49 @@
 {
   "wiki": "NWU Wiki",
-  "updated": "2026-10-11",
+  "updated": "2026-10-12",
+  "categories": [
+    {
+      "id": "Guides",
+      "icon": "map"
+    },
+    {
+      "id": "Modules",
+      "icon": "menu_book"
+    },
+    {
+      "id": "Lecturers",
+      "icon": "person"
+    },
+    {
+      "id": "Places",
+      "icon": "location_on"
+    },
+    {
+      "id": "Residences",
+      "icon": "home"
+    },
+    {
+      "id": "University Programs",
+      "icon": "school"
+    },
+    {
+      "id": "Societies",
+      "icon": "groups"
+    },
+    {
+      "id": "Traditions & Events",
+      "icon": "celebration"
+    },
+    {
+      "id": "Glossary",
+      "icon": "abc"
+    }
+  ],
   "pages": [
     {
       "id": "home",
       "title": "Home",
-      "category": "Start here",
+      "category": "Guides",
       "icon": "home",
       "file": "home.md",
       "desc": "What this wiki is and how to use it",
@@ -14,7 +52,7 @@
     {
       "id": "getting-started",
       "title": "First Weeks Guide",
-      "category": "Start here",
+      "category": "Guides",
       "icon": "school",
       "file": "getting-started.md",
       "desc": "eFundi login, eFundiHax setup, wifi, student card, where everything lives",
@@ -32,7 +70,7 @@
     {
       "id": "modules",
       "title": "Modules & Synced Content",
-      "category": "Studies",
+      "category": "Modules",
       "icon": "menu_book",
       "file": "modules.md",
       "desc": "Live list of every module synced by eFundiHax, with notes per faculty",
@@ -48,7 +86,7 @@
     {
       "id": "exams",
       "title": "Exams, Tests & Deadlines",
-      "category": "Studies",
+      "category": "Guides",
       "icon": "event",
       "file": "exams.md",
       "desc": "How assessment dates flow from eFundi to your calendar",
@@ -65,7 +103,7 @@
     {
       "id": "bursaries",
       "title": "Bursaries Guide",
-      "category": "Money",
+      "category": "Guides",
       "icon": "savings",
       "file": "bursaries.md",
       "desc": "How SA bursaries work, what to apply for, and common traps",
@@ -83,7 +121,7 @@
     {
       "id": "bursary-directory",
       "title": "Bursary Directory",
-      "category": "Money",
+      "category": "Guides",
       "icon": "list",
       "file": "bursary-directory.md",
       "stub": true,
@@ -100,7 +138,7 @@
     {
       "id": "campus",
       "title": "Campus Life",
-      "category": "Campus",
+      "category": "Places",
       "icon": "location_city",
       "file": "campus.md",
       "stub": true,
@@ -119,7 +157,7 @@
     {
       "id": "contributing",
       "title": "How to Contribute",
-      "category": "About",
+      "category": "Guides",
       "icon": "edit_note",
       "file": "contributing.md",
       "desc": "Add or fix a page from your phone or laptop in 2 minutes — no git needed",
@@ -251,7 +289,7 @@
     {
       "id": "wildcat",
       "title": "Wildcat (sample)",
-      "category": "General",
+      "category": "Glossary",
       "icon": "local_drink",
       "file": "wildcat.md",
       "desc": "Sample one-off page: the unofficial energy drink",

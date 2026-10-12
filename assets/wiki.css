@@ -95,6 +95,8 @@
 }
 .nav-item .material-symbols-outlined { font-size: 15px; color: #988d9e; }
 .nav-item.active .material-symbols-outlined { color: #dbb9fa; }
+.nav-item.nav-empty { color: #988d9e; font-style: italic; }
+.nav-item.nav-empty:hover { color: #ffb77a; }
 
 /* ===== Callouts produced from > [!note] style blockquotes ===== */
 #pageBody blockquote.wiki-note   { border-left-color: #6b3d8f; }
