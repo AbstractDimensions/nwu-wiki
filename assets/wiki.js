@@ -323,6 +323,49 @@
     toastTimer = setTimeout(function () { elToast.hidden = true; }, 3200);
   }
 
+  function showDeployBanner(slug, after) {
+    var banner = document.createElement('div');
+    banner.id = 'deployBanner';
+    banner.className = 'deploy-banner';
+    banner.innerHTML = '<div class="deploy-banner-content">' +
+      '<span class="material-symbols-outlined deploy-spin">cloud_upload</span>' +
+      '<span class="deploy-text">Page created! Deploying to live site (usually 1\u20132 minutes). You can keep editing here.</span>' +
+      '<button class="deploy-check" data-slug="' + escapeHtml(slug) + '" title="Check if live">Check if live</button>' +
+      (after ? '<button class="deploy-continue">Continue editing</button>' : '') +
+      '</div>';
+    document.body.appendChild(banner);
+    banner.querySelector('.deploy-check').addEventListener('click', function () {
+      checkPageLive(slug, this);
+    });
+    if (after) {
+      banner.querySelector('.deploy-continue').addEventListener('click', function () {
+        var b = document.getElementById('deployBanner');
+        if (b) b.remove();
+        if (after) after();
+      });
+    }
+  }
+
+  function checkPageLive(slug, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Checking\u2026';
+    fetch('pages/' + encodeURIComponent(slug) + '.md', { cache: 'no-store' })
+      .then(function (r) {
+        if (r.ok) {
+          location.hash = '#/' + slug;
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Check if live';
+          showToast('Still deploying\u2026 check again in a minute.');
+        }
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Check if live';
+        showToast('Could not check \u2014 try again in a moment.');
+      });
+  }
+
   function updateSaveBar() {
     if (!elSaveBar || !elSaveStatus) return;
     elSaveBar.hidden = !dirty;
