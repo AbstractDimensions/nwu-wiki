@@ -473,6 +473,7 @@
   }
 
   function saveCommit(after) {
+    if (typeof after !== 'function') after = null; // click events arrive here as arg 1
     console.log('[nwu-wiki] save requested', { file: currentMeta && currentMeta.file, dirty: dirty, editing: editingIndex });
     if (!dirty && editingIndex < 0) { if (after) after(); return; }
     if (editingIndex >= 0 && !applyEditor()) return;
@@ -896,7 +897,7 @@
     });
   });
   // Guarded: a stale cached index.html must never kill the whole script.
-  if (elSaveCommit) elSaveCommit.addEventListener('click', saveCommit);
+  if (elSaveCommit) elSaveCommit.addEventListener('click', function () { saveCommit(); });
   if (elSaveDiscard) elSaveDiscard.addEventListener('click', discardAll);
   if (elDrawerClose) elDrawerClose.addEventListener('click', function () { elDrawer.hidden = true; });
   // TOC clicks: take over from the native top-jump so the heading lands
