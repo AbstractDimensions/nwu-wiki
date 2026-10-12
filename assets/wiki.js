@@ -168,6 +168,7 @@
         if (pendingAnchor) scrollToAnchor(); else window.scrollTo(0, 0);
       })
       .catch(function (e) {
+        console.error('[nwu-wiki] page load FAILED', { file: meta.file, error: String(e) });
         elBody.innerHTML = '<div class="text-error text-sm font-label uppercase tracking-widest">' +
           'Could not load <code>pages/' + escapeHtml(meta.file) + '</code> — ' + escapeHtml(String(e)) +
           '<p class="text-outline normal-case tracking-normal font-body mt-2 text-xs">' +
@@ -390,16 +391,48 @@
     showToast('Changes discarded.');
   }
 
-  function nickname() {
-    var nick = null;
-    try { nick = localStorage.getItem('nwu_nick'); } catch (e) {}
-    if (!nick) {
-      nick = window.prompt('Your name or nickname (shown in the page history):', '');
-      if (nick === null) return null;
-      nick = nick.trim().slice(0, 40) || 'anonymous student';
-      try { localStorage.setItem('nwu_nick', nick); } catch (e) {}
-    }
-    return nick;
+  // Nickname is OPTIONAL and remembered. First save shows an inline form
+  // (never a popup); the choice persists, anonymous included.
+  function ensureNickname(next) {
+    var nick = '', asked = false;
+    try {
+      nick = localStorage.getItem('nwu_nick') || '';
+      asked = localStorage.getItem('nwu_nick_set') === '1';
+    } catch (e) {}
+    if (asked) { next(nick || 'anonymous student'); return; }
+    openDrawer('Who is saving?',
+      '<p>Your edits are signed in the page history. A nickname is enough — or skip and stay anonymous.</p>' +
+      '<p><input id="nickInput" placeholder="Nickname (optional)" value="' + escapeHtml(nick) + '" style="width:70%;background:#0e0e0e;color:#e5e2e1;border:1px solid #6b3d8f;padding:6px 8px;"> ' +
+      '<button class="mini-btn" id="nickGo">Save</button></p>' +
+      '<p><a href="#" id="nickSkip">Skip — save anonymously</a> · ' +
+      '<a href="#" id="nickCancel">Cancel</a></p>');
+    var done = function (name) {
+      try {
+        localStorage.setItem('nwu_nick', name);
+        localStorage.setItem('nwu_nick_set', '1');
+      } catch (e) {}
+      if (elDrawer) elDrawer.hidden = true;
+      next(name || 'anonymous student');
+    };
+    document.getElementById('nickGo').addEventListener('click', function () {
+      var v = document.getElementById('nickInput').value.trim().slice(0, 40);
+      done(v);
+    });
+    document.getElementById('nickInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        var v = document.getElementById('nickInput').value.trim().slice(0, 40);
+        done(v);
+      }
+      e.stopPropagation();
+    });
+    document.getElementById('nickSkip').addEventListener('click', function (e) {
+      e.preventDefault();
+      done('');
+    });
+    document.getElementById('nickCancel').addEventListener('click', function (e) {
+      e.preventDefault();
+      if (elDrawer) elDrawer.hidden = true;
+    });
   }
 
   function copyText(text, done) {
@@ -440,15 +473,19 @@
   }
 
   function saveCommit(after) {
+    console.log('[nwu-wiki] save requested', { file: currentMeta && currentMeta.file, dirty: dirty, editing: editingIndex });
     if (!dirty && editingIndex < 0) { if (after) after(); return; }
     if (editingIndex >= 0 && !applyEditor()) return;
     if (!dirty) { if (after) after(); return; }
     if (!SAVE_URL) { saveFallback(after || null); return; }
-    var nick = nickname();
-    if (nick === null) return;
+    ensureNickname(function (nick) { postSave(nick, after); });
+  }
+
+  function postSave(nick, after) {
     var content = joinSections(sections);
     if (content.length > 200000) { showToast('Page too large to save (200KB cap).'); return; }
     if (elSaveStatus) elSaveStatus.textContent = 'Saving…';
+    console.log('[nwu-wiki] POST save', { file: currentMeta.file, bytes: content.length, baseSha: currentSha, nick: nick });
     // text/plain (not application/json): keeps this a CORS-simple request so
     // no preflight is needed — Apps Script has no OPTIONS handler, while the
     // final googleusercontent response already carries ACAO:*. The backend
@@ -467,7 +504,9 @@
     }).then(function (r) {
       return r.json().then(function (j) { return { status: r.status, body: j }; });
     }).then(function (res) {
+      console.log('[nwu-wiki] save response', { status: res.status, body: res.body });
       if (res.status === 409) {
+        console.warn('[nwu-wiki] save conflict, loading latest');
         copyText(content, function () {});
         openDrawer('Someone saved first',
           '<p>Another edit landed while you worked. Your version is <strong>copied to the clipboard</strong> — loading their version now so you can re-apply your change on top.</p>');
@@ -482,11 +521,22 @@
       updateSaveBar();
       if (elDrawer) elDrawer.hidden = true;
       renderBody();
-      showToast('Saved — live in about a minute.');
+      showToast('Saved — live in about a minute.' + (res.body.commit ? '' : ''));
+      console.log('[nwu-wiki] save ok', { commit: res.body.commit, sha: res.body.sha, noop: !!res.body.noop });
       if (after) after();
     }).catch(function (e) {
+      console.error('[nwu-wiki] save FAILED', e);
       if (elSaveStatus) elSaveStatus.textContent = 'Unsaved changes';
-      showToast('Save failed (' + String(e.message || e).slice(0, 80) + ') — try again.');
+      openDrawer('Save failed',
+        '<p><strong>' + escapeHtml(String((e && e.message) || e)).slice(0, 300) + '</strong></p>' +
+        '<p class="editor-hint">Your edits are still here — nothing was lost. ' +
+        'Common causes: no connection, or an old cached copy of this page (hard-refresh: Ctrl+Shift+R). ' +
+        'Open the browser console (F12) and send the lines starting with <code>[nwu-wiki]</code>.</p>' +
+        '<p><button class="mini-btn" id="saveRetry">Try again</button></p>');
+      document.getElementById('saveRetry').addEventListener('click', function () {
+        if (elDrawer) elDrawer.hidden = true;
+        saveCommit(after);
+      });
     });
   }
 
@@ -798,6 +848,7 @@
   }
 
   window.addEventListener('hashchange', route);
+  console.log('[nwu-wiki] boot', { build: '2026-10-12.5', saveBackend: SAVE_URL ? 'connected' : 'fallback' });
   // Section editing clicks: headings + lead paragraph (links exempt).
   elBody.addEventListener('click', function (ev) {
     if (editingIndex >= 0 || !ev.target.closest) return;
