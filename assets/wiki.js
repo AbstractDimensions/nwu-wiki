@@ -1028,6 +1028,7 @@
   try {
     if (elNickField) elNickField.value = localStorage.getItem('nwu_nick') || '';
   } catch (e) {}
+  window.openCreatePage = openCreatePage;
   loadIndex().then(route);
   initSearch();
 })();
