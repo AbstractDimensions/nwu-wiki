@@ -151,5 +151,20 @@ tailwind.config = {
 </div>
 
 <script src="assets/wiki.js"></script>
+
+<!-- In-place editing UI: floating save bar, fallback drawer, toasts -->
+<div id="saveBar" class="save-bar" hidden>
+  <span id="saveStatus" class="save-status">Unsaved changes</span>
+  <button id="saveDiscard" class="bevel-out bg-surface-container-high text-on-surface font-label font-black uppercase text-[10px] px-3 py-2 tracking-widest hover:brightness-125">Discard</button>
+  <button id="saveCommit" class="bevel-out bg-primary text-on-primary font-label font-black uppercase text-[10px] px-3 py-2 tracking-widest hover:brightness-110">Save to wiki</button>
+</div>
+<div id="saveDrawer" class="save-drawer" hidden>
+  <div class="save-drawer-head">
+    <strong id="saveDrawerTitle">Save</strong>
+    <button id="saveDrawerClose" class="mini-btn" title="Close">✕</button>
+  </div>
+  <div id="saveDrawerBody" class="save-drawer-body"></div>
+</div>
+<div id="wikiToast" class="wiki-toast" hidden></div>
 </body>
 </html>

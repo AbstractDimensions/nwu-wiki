@@ -108,6 +108,56 @@
 }
 .search-hit:hover, .search-hit.active { background: #2a2a2a; color: #f0dbff; border-left-color: #6b3d8f; }
 
+/* ===== In-place section editing (prime directive: no markdown needed) ===== */
+#pageBody h2.sec-editable, #pageBody h3.sec-editable { cursor: pointer; border-radius: 2px; }
+#pageBody h2.sec-editable:hover, #pageBody h3.sec-editable:hover,
+#pageBody p.sec-lead:hover { background: rgba(219, 185, 250, 0.10); }
+#pageBody p.sec-lead { cursor: pointer; border-radius: 2px; }
+.sec-edit {
+  display: none; font-size: 15px; vertical-align: middle; margin-left: 8px;
+  color: #ffb77a; user-select: none;
+}
+#pageBody h2.sec-editable:hover .sec-edit, #pageBody h3.sec-editable:hover .sec-edit,
+#pageBody p.sec-lead:hover .sec-edit { display: inline-block; }
+.toc-title { cursor: pointer; }
+.toc-title:hover { color: #ffb77a; }
+.toc-title:hover::after { content: " ＋"; color: #ffb77a; }
+.section-editor { margin: 1em 0; }
+.section-editor textarea {
+  width: 100%; min-height: 220px; box-sizing: border-box;
+  background: #0e0e0e; color: #e5e2e1; border: 1px solid #6b3d8f;
+  font-family: ui-monospace, monospace; font-size: 0.85rem; line-height: 1.55;
+  padding: 0.8em;
+}
+.section-editor .editor-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+.editor-btn {
+  font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; padding: 0.6em 1.2em; cursor: pointer;
+}
+.editor-apply { background: #6b3d8f; color: #fff; border: 1px solid #4c4453; }
+.editor-cancel { background: #2a2a2a; color: #c9c6c4; border: 1px solid #4c4453; }
+.editor-hint { font-size: 0.72rem; color: #988d9e; }
+.save-bar {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 12px; z-index: 60;
+  display: flex; gap: 8px; align-items: center;
+  background: #201f1f; border: 1px solid #6b3d8f; padding: 8px 12px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.6); max-width: 94vw; flex-wrap: wrap;
+}
+.save-status { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #ffdcc2; }
+.save-drawer {
+  position: fixed; right: 12px; bottom: 64px; z-index: 60; width: min(480px, 94vw);
+  max-height: 70vh; overflow: auto; background: #201f1f; border: 1px solid #4c4453; padding: 12px;
+}
+.save-drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; }
+.save-drawer-body { font-size: 0.82rem; color: #c9c6c4; }
+.save-drawer-body textarea { width: 100%; box-sizing: border-box; min-height: 160px; background: #0e0e0e; color: #e5e2e1; border: 1px solid #4c4453; font-family: ui-monospace, monospace; font-size: 0.75rem; }
+.save-drawer .mini-btn { cursor: pointer; background: #2a2a2a; color: #e5e2e1; border: 1px solid #4c4453; padding: 2px 8px; }
+.wiki-toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 70px; z-index: 70;
+  background: #2a2a2a; color: #f0dbff; border: 1px solid #6b3d8f;
+  font-size: 0.8rem; padding: 0.6em 1.2em; max-width: 92vw;
+}
+
 /* ===== Wikipedia-layout: tabs ===== */
 .wiki-tabs {
   display: flex; flex-wrap: wrap; gap: 2px; padding: 0 1.5rem;

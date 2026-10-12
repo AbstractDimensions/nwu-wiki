@@ -11,6 +11,24 @@
 
   var pagesIndex = [];
   var currentPage = null;
+  var currentMeta = null;
+  var currentMarkdown = '';
+  var sections = [];
+  var editingIndex = -1;
+  var dirty = false;
+  var currentSha = null;
+
+  // Save backend (spec Section 3). Override without code changes:
+  //   wiki URL ?save=https://<worker>.workers.dev&key=<write-key>
+  // Until connected, Save falls back to copy + GitHub editor.
+  var SAVE_URL = null, WRITE_KEY = 'nwu-wiki-write';
+  try {
+    var _q = new URLSearchParams(location.search);
+    if (_q.get('save')) { SAVE_URL = _q.get('save'); localStorage.setItem('nwu_save_url', SAVE_URL); }
+    else { SAVE_URL = localStorage.getItem('nwu_save_url') || ''; }
+    if (_q.get('key')) { WRITE_KEY = _q.get('key'); localStorage.setItem('nwu_write_key', WRITE_KEY); }
+    else { WRITE_KEY = localStorage.getItem('nwu_write_key') || WRITE_KEY; }
+  } catch (e) { SAVE_URL = ''; }
 
   var elTitle = document.getElementById('pageTitle');
   var elCat = document.getElementById('pageCategory');
@@ -23,6 +41,16 @@
   var elTabHistory = document.getElementById('tabHistory');
   var elUpdated = document.getElementById('pageUpdated');
   var elCats = document.getElementById('pageCats');
+  var elSaveBar = document.getElementById('saveBar');
+  var elSaveStatus = document.getElementById('saveStatus');
+  var elSaveCommit = document.getElementById('saveCommit');
+  var elSaveDiscard = document.getElementById('saveDiscard');
+  var elDrawer = document.getElementById('saveDrawer');
+  var elDrawerTitle = document.getElementById('saveDrawerTitle');
+  var elDrawerBody = document.getElementById('saveDrawerBody');
+  var elDrawerClose = document.getElementById('saveDrawerClose');
+  var elToast = document.getElementById('wikiToast');
+  var toastTimer = null;
   var navEl = document.getElementById('wikiNav');
   var navMobileEl = document.getElementById('wikiNavMobile');
   var searchEl = document.getElementById('wikiSearch');
@@ -126,11 +154,15 @@
         return r.text();
       })
       .then(function (md) {
-        var raw = marked.parse(md);
-        var clean = window.DOMPurify ? DOMPurify.sanitize(raw) : raw;
-        elBody.innerHTML = infoboxHtml(meta) + staleHtml(meta) + sampleHtml(meta) + clean +
-          (meta.stub ? stubRibbon() : '');
-        postProcess();
+        currentMeta = meta;
+        currentMarkdown = md;
+        sections = splitSections(md);
+        editingIndex = -1;
+        dirty = false;
+        currentSha = null;
+        updateSaveBar();
+        renderBody();
+        fetchSha(meta);
         if (pendingAnchor) scrollToAnchor(); else window.scrollTo(0, 0);
       })
       .catch(function (e) {
@@ -215,6 +247,288 @@
     else elBody.insertBefore(nav, elBody.firstChild);
   }
 
+  /* ---------- in-place section editing ---------- */
+  // Split raw markdown into editable sections: [0] = preamble (title + lead),
+  // then one per ## / ### heading, in document order (matches the TOC).
+  function splitSections(md) {
+    var secs = [{ level: 0, title: '', lines: [] }];
+    md.split('\n').forEach(function (ln) {
+      var m = ln.match(/^(#{2,3})\s+(.*)$/);
+      if (m) {
+        secs.push({ level: m[1].length, title: m[2], lines: [] });
+      } else {
+        secs[secs.length - 1].lines.push(ln);
+      }
+    });
+    return secs;
+  }
+
+  function serializeSection(s, i) {
+    var head = (i === 0) ? '' : (s.level === 2 ? '## ' : '### ') + s.title + '\n';
+    return head + s.lines.join('\n');
+  }
+
+  function joinSections(secs) {
+    return secs.map(serializeSection).join('\n').replace(/\n{3,}/g, '\n\n').replace(/^\n+/, '');
+  }
+
+  function renderBody() {
+    var raw = marked.parse(joinSections(sections));
+    var clean = window.DOMPurify ? DOMPurify.sanitize(raw) : raw;
+    elBody.innerHTML = infoboxHtml(currentMeta) + staleHtml(currentMeta) +
+      sampleHtml(currentMeta) + '<div id="mdContent">' + clean + '</div>' +
+      (currentMeta.stub ? stubRibbon() : '');
+    postProcess();
+    if (editingIndex >= 0) mountEditor();
+  }
+
+  function showToast(msg) {
+    if (!elToast) return;
+    elToast.textContent = msg;
+    elToast.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { elToast.hidden = true; }, 3200);
+  }
+
+  function updateSaveBar() {
+    if (!elSaveBar || !elSaveStatus) return;
+    elSaveBar.hidden = !dirty;
+    if (dirty) {
+      var n = sections.filter(function (s, i) { return s._touched; }).length;
+      elSaveStatus.textContent = 'Unsaved changes' + (n ? ' (' + n + ' section' + (n === 1 ? '' : 's') + ')' : '');
+    }
+  }
+
+  function openDrawer(title, html) {
+    if (!elDrawer || !elDrawerTitle || !elDrawerBody) return;
+    elDrawerTitle.textContent = title;
+    elDrawerBody.innerHTML = html;
+    elDrawer.hidden = false;
+  }
+
+  function startEdit(idx) {
+    if (editingIndex >= 0) { showToast('Finish this section first — Apply or Cancel.'); return; }
+    if (idx < 0 || idx >= sections.length) return;
+    editingIndex = idx;
+    renderBody();
+    var ta = elBody.querySelector('.section-editor textarea');
+    if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+  }
+
+  function mountEditor() {
+    var md = elBody.querySelector('#mdContent');
+    if (!md) return;
+    var heads = md.querySelectorAll('h2, h3');
+    var range;
+    if (editingIndex === 0) {
+      // Preamble: everything before the first h2 (title + lead + top notes).
+      range = [];
+      var kid = md.firstElementChild;
+      while (kid && kid.tagName !== 'H2') { range.push(kid); kid = kid.nextElementSibling; }
+    } else {
+      var headEl = heads[editingIndex - 1];
+      if (!headEl) { editingIndex = -1; return; }
+      range = sectionRange(headEl);
+    }
+    if (!range.length) { editingIndex = -1; return; }
+    var box = document.createElement('div');
+    box.className = 'section-editor';
+    var label = editingIndex === 0 ? 'Introduction' : ('Section: ' + sections[editingIndex].title);
+    box.innerHTML = '<div class="editor-hint">Editing <strong>' + escapeHtml(label) +
+      '</strong> — plain text is fine, use # sparingly.</div>' +
+      '<textarea></textarea>' +
+      '<div class="editor-row"><button class="editor-btn editor-apply">Apply</button>' +
+      '<button class="editor-btn editor-cancel">Cancel</button>' +
+      '<span class="editor-hint">Apply keeps editing here · Save to wiki (below) publishes</span></div>';
+    box.querySelector('textarea').value = serializeSection(sections[editingIndex], editingIndex);
+    md.insertBefore(box, range[0]);
+    range.forEach(function (el) { el.remove(); });
+    var ta = box.querySelector('textarea');
+    ta.rows = Math.min(24, Math.max(8, ta.value.split('\n').length + 2));
+    box.querySelector('.editor-apply').addEventListener('click', applyEditor);
+    box.querySelector('.editor-cancel').addEventListener('click', function () {
+      editingIndex = -1;
+      renderBody();
+    });
+  }
+
+  function applyEditor() {
+    var ta = elBody.querySelector('.section-editor textarea');
+    if (!ta) return;
+    var text = ta.value;
+    if (!text.trim()) { showToast('Section is empty — Cancel instead if you meant to delete.'); return; }
+    if (editingIndex === 0) {
+      sections[0] = { level: 0, title: '', lines: text.split('\n') };
+    } else {
+      var lines = text.split('\n');
+      var m = (lines[0] || '').match(/^(#{2,3})\s+(.*)$/);
+      if (m) {
+        sections[editingIndex] = { level: m[1].length, title: m[2], lines: lines.slice(1) };
+      } else {
+        sections[editingIndex].lines = lines;
+      }
+    }
+    sections[editingIndex]._touched = true;
+    editingIndex = -1;
+    dirty = true;
+    updateSaveBar();
+    renderBody();
+    showToast('Applied — review below, then Save to wiki when ready.');
+  }
+
+  function discardAll() {
+    sections = splitSections(currentMarkdown);
+    editingIndex = -1;
+    dirty = false;
+    updateSaveBar();
+    renderBody();
+    showToast('Changes discarded.');
+  }
+
+  function nickname() {
+    var nick = null;
+    try { nick = localStorage.getItem('nwu_nick'); } catch (e) {}
+    if (!nick) {
+      nick = window.prompt('Your name or nickname (shown in the page history):', '');
+      if (nick === null) return null;
+      nick = nick.trim().slice(0, 40) || 'anonymous student';
+      try { localStorage.setItem('nwu_nick', nick); } catch (e) {}
+    }
+    return nick;
+  }
+
+  function copyText(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+    } else { fallbackCopy(text, done); }
+  }
+
+  function fallbackCopy(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    ta.remove();
+    done();
+  }
+
+  function saveFallback() {
+    var content = joinSections(sections);
+    openDrawer('Publish without the save backend',
+      '<p>The one-click save backend is not connected yet. Until then, publishing takes two taps:</p>' +
+      '<p><button class="mini-btn" id="fbCopy">1 · Copy updated page</button> ' +
+      '<a class="mini-btn" style="text-decoration:none" target="_blank" rel="noopener" href="' +
+      escapeHtml(githubUrl('pages/' + currentMeta.file, 'edit')) + '">2 · Open GitHub editor</a></p>' +
+      '<p class="editor-hint">Paste over everything there, press Commit changes. Done — same result, one extra step.</p>' +
+      '<textarea readonly>' + escapeHtml(content) + '</textarea>');
+    document.getElementById('fbCopy').addEventListener('click', function () {
+      copyText(content, function () { showToast('Copied — paste it into the GitHub editor.'); });
+    });
+  }
+
+  function saveCommit() {
+    if (!dirty) return;
+    if (!SAVE_URL) { saveFallback(); return; }
+    var nick = nickname();
+    if (nick === null) return;
+    var content = joinSections(sections);
+    if (content.length > 200000) { showToast('Page too large to save (200KB cap).'); return; }
+    if (elSaveStatus) elSaveStatus.textContent = 'Saving…';
+    fetch(SAVE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        key: WRITE_KEY,
+        file: currentMeta.file,
+        content: content,
+        message: 'Update ' + currentMeta.title,
+        nickname: nick,
+        baseSha: currentSha
+      })
+    }).then(function (r) {
+      return r.json().then(function (j) { return { status: r.status, body: j }; });
+    }).then(function (res) {
+      if (res.status === 409) {
+        copyText(content, function () {});
+        openDrawer('Someone saved first',
+          '<p>Another edit landed while you worked. Your version is <strong>copied to the clipboard</strong> — loading their version now so you can re-apply your change on top.</p>');
+        reloadLatest();
+        return;
+      }
+      if (!res.body || !res.body.ok) throw new Error((res.body && res.body.error) || ('HTTP ' + res.status));
+      currentMarkdown = content;
+      sections = splitSections(content);
+      if (res.body.sha) currentSha = res.body.sha;
+      dirty = false;
+      updateSaveBar();
+      if (elDrawer) elDrawer.hidden = true;
+      renderBody();
+      showToast('Saved — live in about a minute.');
+    }).catch(function (e) {
+      if (elSaveStatus) elSaveStatus.textContent = 'Unsaved changes';
+      showToast('Save failed (' + String(e.message || e).slice(0, 80) + ') — try again.');
+    });
+  }
+
+  function reloadLatest() {
+    fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/pages/' + encodeURIComponent(currentMeta.file))
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j.content) throw new Error('no content');
+        var md;
+        try {
+          md = decodeURIComponent(escape(atob(j.content.replace(/\n/g, ''))));
+        } catch (e) {
+          md = atob(j.content.replace(/\n/g, ''));
+        }
+        currentMarkdown = md;
+        currentSha = j.sha || null;
+        sections = splitSections(md);
+        editingIndex = -1;
+        dirty = false;
+        updateSaveBar();
+        renderBody();
+      })
+      .catch(function () { showToast('Could not load latest — check connection.'); });
+  }
+
+  function fetchSha(meta) {
+    fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/pages/' + encodeURIComponent(meta.file))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.sha) currentSha = j.sha; })
+      .catch(function () { /* sha stays null: save still works, without conflict check */ });
+  }
+
+  /* Hover pencil affordances on editable headings + lead paragraph. */
+  function markEditable() {
+    var md = elBody.querySelector('#mdContent');
+    if (!md) return;
+    Array.prototype.forEach.call(md.querySelectorAll('h2, h3'), function (h) {
+      h.classList.add('sec-editable');
+      if (!h.querySelector('.sec-edit')) {
+        var s = document.createElement('span');
+        s.className = 'sec-edit material-symbols-outlined';
+        s.textContent = 'edit';
+        h.appendChild(s);
+      }
+    });
+    var h1 = md.querySelector('h1');
+    if (h1) {
+      var sib = h1.nextElementSibling;
+      while (sib && sib.tagName !== 'P') sib = sib.nextElementSibling;
+      if (sib) {
+        sib.classList.add('sec-lead');
+        if (!sib.querySelector('.sec-edit')) {
+          var s2 = document.createElement('span');
+          s2.className = 'sec-edit material-symbols-outlined';
+          s2.textContent = 'edit';
+          sib.appendChild(s2);
+        }
+      }
+    }
+  }
+
   function stubRibbon() {
     return '<div class="mt-8 bevel-out bg-surface-container p-4 text-xs text-outline font-body">' +
       '<span class="material-symbols-outlined text-secondary text-sm align-middle">construction</span> ' +
@@ -233,6 +547,7 @@
   /* Enhance rendered HTML: callout styling + external link behaviour + TOC + live hooks */
   function postProcess() {
     buildToc();
+    markEditable();
     Array.prototype.forEach.call(elBody.querySelectorAll('blockquote'), function (bq) {
       var t = (bq.textContent || '');
       var tag = (t.match(/^\s*\[!(note|tip|warning|warn)\]/i) || [])[1] || '';
@@ -407,6 +722,55 @@
   }
 
   window.addEventListener('hashchange', route);
+  // Section editing clicks: headings + lead paragraph (links exempt).
+  elBody.addEventListener('click', function (ev) {
+    if (editingIndex >= 0 || !ev.target.closest) return;
+    if (ev.target.closest('a')) return;
+    var h = ev.target.closest('#mdContent h2, #mdContent h3');
+    if (h) {
+      var heads = Array.prototype.slice.call(elBody.querySelectorAll('#mdContent h2, #mdContent h3'));
+      startEdit(heads.indexOf(h) + 1);
+      return;
+    }
+    if (ev.target.closest('#mdContent p.sec-lead')) startEdit(0);
+  });
+  // Add-section flow: click the Contents title for a title prompt.
+  elBody.addEventListener('click', function (ev) {
+    if (editingIndex >= 0 || !ev.target.closest) return;
+    var t = ev.target.closest('.toc-title');
+    if (!t || t.querySelector('input')) return;
+    t.innerHTML = '<input id="newSecTitle" placeholder="New section title…" style="width:70%;background:#0e0e0e;color:#e5e2e1;border:1px solid #6b3d8f;padding:2px 6px;font-size:0.8rem;"> ' +
+      '<button id="newSecAdd" class="editor-btn editor-apply" style="padding:2px 8px;">Add</button> ' +
+      '<button id="newSecCancel" class="editor-btn editor-cancel" style="padding:2px 8px;">✕</button>';
+    var input = document.getElementById('newSecTitle');
+    input.focus();
+    document.getElementById('newSecCancel').addEventListener('click', function (e) {
+      e.stopPropagation();
+      renderBody();
+    });
+    var addIt = function () {
+      var title = input.value.trim().slice(0, 80);
+      if (!title) { showToast('Give the section a title first.'); return; }
+      sections.push({ level: 2, title: title, lines: ['', 'Start writing here — click this section to edit.'], _touched: true });
+      dirty = true;
+      updateSaveBar();
+      renderBody();
+      startEdit(sections.length - 1);
+    };
+    document.getElementById('newSecAdd').addEventListener('click', function (e) {
+      e.stopPropagation();
+      addIt();
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') addIt();
+      if (e.key === 'Escape') renderBody();
+      e.stopPropagation();
+    });
+  });
+  // Guarded: a stale cached index.html must never kill the whole script.
+  if (elSaveCommit) elSaveCommit.addEventListener('click', saveCommit);
+  if (elSaveDiscard) elSaveDiscard.addEventListener('click', discardAll);
+  if (elDrawerClose) elDrawerClose.addEventListener('click', function () { elDrawer.hidden = true; });
   // TOC clicks: take over from the native top-jump so the heading lands
   // centered with a flash. URL still updates for sharing (no history spam).
   elBody.addEventListener('click', function (ev) {
