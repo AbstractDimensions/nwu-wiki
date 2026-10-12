@@ -37,5 +37,3 @@ This is the canonical price spot for this page; don't duplicate it elsewhere.
 
 *Sample page showing a free-form General entry. Short is fine — one true
 paragraph beats an empty page.*
-
-Verification probe line (will be reverted).
