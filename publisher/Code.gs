@@ -13,7 +13,7 @@
  *        -> { ok, commit, sha } | { ok:false, error, [currentContent, currentSha] } (409)
  */
 
-var REPO = 'AbstractDimensions/nwu-wiki';
+var REPO = 'eFundiHax/nwu-wiki';
 var WRITE_KEY_DEFAULT = 'nwu-wiki-write';
 var MAX_BYTES = 200000;
 var RATE_PER_MIN = 10;

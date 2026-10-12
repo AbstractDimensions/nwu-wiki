@@ -4,9 +4,9 @@
 (function () {
   'use strict';
 
-  // Auto-detect the repo location from the served hostname, so transferring
-  // the repo into the eFundiHax org later needs no code change.
-  var REPO_OWNER = (location.hostname === 'efundihax.github.io') ? 'eFundiHax' : 'AbstractDimensions';
+  // Auto-detect the repo location from the served hostname, so the old
+  // abstractdimensions.io URL keeps working during the transition.
+  var REPO_OWNER = (location.hostname === 'abstractdimensions.github.io') ? 'AbstractDimensions' : 'eFundiHax';
   var REPO_NAME = 'nwu-wiki';
 
   var pagesIndex = [];

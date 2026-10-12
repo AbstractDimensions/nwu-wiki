@@ -18,7 +18,7 @@ minutes. No git, no command line, no account beyond a GitHub login.
 ## Add a new page
 
 1. Go to the repo's **pages** folder:
-   `github.com/AbstractDimensions/nwu-wiki/tree/main/pages`
+   `github.com/eFundiHax/nwu-wiki/tree/main/pages`
 2. **Add file → Create new file**. Name it something short and lowercase with
    `.md` at the end — e.g. `mafikeng-transport.md`.
 3. Paste your content (start with `# Title`, then write normally).
@@ -99,7 +99,7 @@ community's to-do list:
 
 - **Content question:** edit the page and ask in your commit message.
 - **The site is broken:** open an issue —
-  `github.com/AbstractDimensions/nwu-wiki/issues/new/choose` and describe what
+  `github.com/eFundiHax/nwu-wiki/issues/new/choose` and describe what
   you saw.
 
 Thanks for helping. Every paragraph here is a favour to the student who comes

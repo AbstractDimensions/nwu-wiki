@@ -7,7 +7,7 @@ life, exams and the how-tos that nobody officially documents. Hosted on GitHub
 Pages, edited through GitHub's web editor — no accounts, no build step, no
 git required to help.
 
-🔗 **Live site:** https://abstractdimensions.github.io/nwu-wiki
+🔗 **Live site:** https://efundihax.github.io/nwu-wiki
 
 ## What's here
 
