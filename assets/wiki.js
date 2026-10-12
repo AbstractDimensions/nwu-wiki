@@ -326,6 +326,7 @@
   }
 
   function showDeployBanner(slug, after) {
+    console.log('[nwu-wiki] showDeployBanner called for slug:', slug);
     var banner = document.createElement('div');
     banner.id = 'deployBanner';
     banner.className = 'deploy-banner';
@@ -336,6 +337,7 @@
       (after ? '<button class="deploy-continue">Continue editing</button>' : '') +
       '</div>';
     document.body.appendChild(banner);
+    console.log('[nwu-wiki] deploy banner appended to body');
     banner.querySelector('.deploy-check').addEventListener('click', function () {
       checkPageLive(slug, this);
     });
@@ -732,6 +734,7 @@
       };
       renderBody();
       showToast('Page created! Deploying to live site (1–2 min). You can keep editing here.');
+      console.log('[nwu-wiki] calling showDeployBanner for slug:', slug);
       showDeployBanner(slug, after);
     }).catch(function (e) {
       console.error('[nwu-wiki] create FAILED', e);
