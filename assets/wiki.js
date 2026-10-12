@@ -313,13 +313,26 @@
   }
 
   /* ---------- router ---------- */
-  function scrollToAnchor(which) {
+  var flashTimer = null;
+  function jumpToSection(which) {
     var anchor = which || pendingAnchor;
     pendingAnchor = null;
     if (!anchor) return;
     var el = document.getElementById(anchor);
-    if (el && el.scrollIntoView) el.scrollIntoView();
+    if (!el) return;
+    // Instant centered jump (Wikipedia-style). Smooth scrolling proved
+    // unreliable here — it settled ~800px off-center; the flash below
+    // provides the motion cue instead.
+    el.scrollIntoView({ block: 'center' });
+    // Flash the heading so the eye lands on it, then fade out.
+    el.classList.add('toc-flash');
+    if (flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () {
+      el.classList.remove('toc-flash');
+      flashTimer = null;
+    }, 1400);
   }
+  function scrollToAnchor(which) { jumpToSection(which); }
 
   function route() {
     var hash = location.hash || '';
@@ -352,6 +365,18 @@
   }
 
   window.addEventListener('hashchange', route);
+  // TOC clicks: take over from the native top-jump so the heading lands
+  // centered with a flash. URL still updates for sharing (no history spam).
+  elBody.addEventListener('click', function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest('.wiki-toc a') : null;
+    if (!a) return;
+    var m = (a.getAttribute('href') || '').match(/^#\/([^#]+)#(.+)$/);
+    if (!m) return;
+    ev.preventDefault();
+    pendingAnchor = null;
+    history.replaceState(null, '', '#/' + m[1] + '#' + m[2]);
+    jumpToSection(m[2]);
+  });
   // Seed tab hrefs so early clicks never hit a placeholder '#'.
   elTabEdit.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME;
   elTabHistory.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME + '/commits/main';
