@@ -198,10 +198,12 @@
       })
       .catch(function (e) {
         console.error('[nwu-wiki] page load FAILED', { file: meta.file, error: String(e) });
+        // Page exists in index but not yet on GitHub Pages — show friendly message with retry
         elBody.innerHTML = '<div class="text-error text-sm font-label uppercase tracking-widest">' +
           'Could not load <code>pages/' + escapeHtml(meta.file) + '</code> — ' + escapeHtml(String(e)) +
           '<p class="text-outline normal-case tracking-normal font-body mt-2 text-xs">' +
-          'If this page was just added, wait a minute for GitHub Pages to rebuild.</p></div>';
+          'If this page was just added, wait a minute for GitHub Pages to rebuild.</p></div>' +
+          '<p class="mt-4"><button class="deploy-check" onclick="location.reload()">Check again</button></div>';
       });
   }
 
@@ -719,6 +721,15 @@
       dirty = false;
       updateSaveBar();
       if (elDrawer) elDrawer.hidden = true;
+      // Create a minimal meta for the new page so renderBody doesn't fail
+      currentMeta = {
+        title: title,
+        category: cat,
+        file: 'pages/' + slug + '.md',
+        icon: CREATE_CATEGORIES.find(function(c) { return c.id === cat; })?.icon || 'article',
+        updated: new Date().toISOString().split('T')[0],
+        infobox: { fields: [] }
+      };
       renderBody();
       showToast('Page created! Deploying to live site (1–2 min). You can keep editing here.');
       showDeployBanner(slug, after);
