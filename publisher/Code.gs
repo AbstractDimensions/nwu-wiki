@@ -235,17 +235,18 @@ function buildTemplate_(cat, title, slug) {
   return lines.join('\n');
 }
 
-/* Default sections per category (mirrors pages/category-templates.md). */
+/* Default sections per category (mirrors pages/category-templates.md).
+ * Each template now includes an "Example" section with a filled-out example. */
 var TEMPLATES = {
-  'Guides': ['Overview', 'Step-by-step', 'Tips', 'See also'],
-  'Modules': ['What the module covers', 'Assessment breakdown', 'Lecturers', 'How to pass', 'Known traps', 'Links', 'Resources'],
-  'Lecturers': ['Classes', 'Consultation', 'Assessment style', 'Teaching style'],
-  'Places': ['Getting there', 'Hours', 'Services & prices', 'Tips'],
-  'Residences': ['Overview', 'Rooms & facilities', 'Rules & culture', 'How to apply', 'Tips'],
-  'University Programs': ['Overview', 'Curriculum structure', 'Admission requirements', 'Career paths', 'Links'],
-  'Societies': ['About', 'How to join', 'Meetings & activities', 'Membership'],
-  'Traditions & Events': ['What happens', 'When & where', 'History', 'Tips for first-timers'],
-  'Glossary': ['Meaning', 'Details', 'See also']
+  'Guides': ['Overview', 'Step-by-step', 'Tips', 'See also', 'Example'],
+  'Modules': ['What the module covers', 'Assessment breakdown', 'Lecturers', 'How to pass', 'Known traps', 'Links', 'Resources', 'Example'],
+  'Lecturers': ['Classes', 'Consultation', 'Assessment style', 'Teaching style', 'Example'],
+  'Places': ['Getting there', 'Hours', 'Services & prices', 'Tips', 'Example'],
+  'Residences': ['Overview', 'Rooms & facilities', 'Rules & culture', 'How to apply', 'Tips', 'Example'],
+  'University Programs': ['Overview', 'Curriculum structure', 'Admission requirements', 'Career paths', 'Links', 'Example'],
+  'Societies': ['About', 'How to join', 'Meetings & activities', 'Membership', 'Example'],
+  'Traditions & Events': ['What happens', 'When & where', 'History', 'Tips for first-timers', 'Example'],
+  'Glossary': ['Meaning', 'Details', 'See also', 'Example']
 };
 
 /* One-time secret setup. Run via: clasp run setupStore --params '[{"k":"GITHUB_PAT","v":"..."}]'
