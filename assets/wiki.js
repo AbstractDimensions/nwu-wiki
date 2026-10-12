@@ -356,6 +356,9 @@
     fetch('pages/' + encodeURIComponent(slug) + '.md', { cache: 'no-store' })
       .then(function (r) {
         if (r.ok) {
+          // Remove the deploy banner before navigating
+          var banner = document.getElementById('deployBanner');
+          if (banner) banner.remove();
           location.hash = '#/' + slug;
         } else {
           btn.disabled = false;
