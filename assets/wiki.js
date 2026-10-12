@@ -1090,8 +1090,8 @@
     if (dirty || editingIndex >= 0) { e.preventDefault(); e.returnValue = ''; }
   });
   // Seed tab hrefs so early clicks never hit a placeholder '#'.
-  elTabEdit.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME;
-  elTabHistory.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME + '/commits/main';
+  if (elTabEdit) elTabEdit.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME;
+  if (elTabHistory) elTabHistory.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME + '/commits/main';
   // Prefill the save-bar nickname from the remembered choice.
   try {
     if (elNickField) elNickField.value = localStorage.getItem('nwu_nick') || '';
