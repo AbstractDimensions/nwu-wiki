@@ -449,9 +449,13 @@
     var content = joinSections(sections);
     if (content.length > 200000) { showToast('Page too large to save (200KB cap).'); return; }
     if (elSaveStatus) elSaveStatus.textContent = 'Saving…';
+    // text/plain (not application/json): keeps this a CORS-simple request so
+    // no preflight is needed — Apps Script has no OPTIONS handler, while the
+    // final googleusercontent response already carries ACAO:*. The backend
+    // parses postData.contents as JSON regardless of content type.
     fetch(SAVE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         key: WRITE_KEY,
         file: currentMeta.file,
