@@ -997,6 +997,7 @@
     });
   }
   // Sidebar "Add a page" + empty-category links → in-app create flow
+  document.getElementById('addPageBtn').addEventListener('click', openCreatePage);
   Array.prototype.forEach.call(document.querySelectorAll('a[href*="/new/main/pages"], a.nav-empty'), function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
