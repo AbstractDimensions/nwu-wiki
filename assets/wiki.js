@@ -1077,6 +1077,7 @@
     if (elNickField) elNickField.value = localStorage.getItem('nwu_nick') || '';
   } catch (e) {}
   window.openCreatePage = openCreatePage;
+  window.showDeployBanner = showDeployBanner;
   loadIndex().then(route);
   initSearch();
 })();
