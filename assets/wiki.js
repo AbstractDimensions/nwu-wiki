@@ -638,6 +638,7 @@
     });
     elCreateDrawer.hidden = false;
   }
+  window.openCreatePage = openCreatePage;
 
   function createPageGo() {
     if (!createCat) return;
