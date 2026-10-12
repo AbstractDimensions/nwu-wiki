@@ -1,10 +1,10 @@
 # Wildcat
 
 > [!note]
-> Sample one-off page — Wildcat is a real drink, but prices and variants
+> Sample one-off page - Wildcat is a real drink, but prices and variants
 > below are unverified. Last checked: never (sample).
 
-The unofficial energy drink of late-night study sessions — a sweet,
+The unofficial energy drink of late-night study sessions - a sweet,
 high-caffeine canned drink sold at tuck shops and vending machines around
 campus. Mention "pulling a Wildcat" and every student knows you mean an
 all-nighter.
@@ -17,13 +17,13 @@ third-year answers without thinking.
 
 ## Variants
 
-- **Original** — the classic green can
-- **Sugar-free** — black can, tastes like compromise *(unconfirmed — please
+- **Original** - the classic green can
+- **Sugar-free** - black can, tastes like compromise *(unconfirmed - please
   check)*
 
 ### Price
 
-Usually R20–R30 per can at campus tuck shops *(unconfirmed — please check)*.
+Usually R20-R30 per can at campus tuck shops *(unconfirmed - please check)*.
 This is the canonical price spot for this page; don't duplicate it elsewhere.
 
 ## Health note
@@ -35,5 +35,5 @@ This is the canonical price spot for this page; don't duplicate it elsewhere.
 
 ---
 
-*Sample page showing a free-form General entry. Short is fine — one true
+*Sample page showing a free-form General entry. Short is fine - one true
 paragraph beats an empty page.*
