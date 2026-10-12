@@ -163,6 +163,7 @@
         updateSaveBar();
         renderBody();
         fetchSha(meta);
+        lastStableHash = location.hash;
         if (pendingAnchor) scrollToAnchor(); else window.scrollTo(0, 0);
       })
       .catch(function (e) {
@@ -339,6 +340,7 @@
       '<textarea></textarea>' +
       '<div class="editor-row"><button class="editor-btn editor-apply">Apply</button>' +
       '<button class="editor-btn editor-cancel">Cancel</button>' +
+      '<a class="editor-btn editor-cancel" style="text-decoration:none" target="_blank" rel="noopener" title="How to use Markdown (opens rentry.co guide)" href="https://rentry.co/how">?</a>' +
       '<span class="editor-hint">Apply keeps editing here · Save to wiki (below) publishes</span></div>';
     box.querySelector('textarea').value = serializeSection(sections[editingIndex], editingIndex);
     md.insertBefore(box, range[0]);
@@ -354,9 +356,9 @@
 
   function applyEditor() {
     var ta = elBody.querySelector('.section-editor textarea');
-    if (!ta) return;
+    if (!ta) return false;
     var text = ta.value;
-    if (!text.trim()) { showToast('Section is empty — Cancel instead if you meant to delete.'); return; }
+    if (!text.trim()) { showToast('Section is empty — Cancel instead if you meant to delete.'); return false; }
     if (editingIndex === 0) {
       sections[0] = { level: 0, title: '', lines: text.split('\n') };
     } else {
@@ -374,6 +376,7 @@
     updateSaveBar();
     renderBody();
     showToast('Applied — review below, then Save to wiki when ready.');
+    return true;
   }
 
   function discardAll() {
@@ -413,23 +416,32 @@
     done();
   }
 
-  function saveFallback() {
+  function saveFallback(after) {
     var content = joinSections(sections);
     openDrawer('Publish without the save backend',
       '<p>The one-click save backend is not connected yet. Until then, publishing takes two taps:</p>' +
       '<p><button class="mini-btn" id="fbCopy">1 · Copy updated page</button> ' +
       '<a class="mini-btn" style="text-decoration:none" target="_blank" rel="noopener" href="' +
-      escapeHtml(githubUrl('pages/' + currentMeta.file, 'edit')) + '">2 · Open GitHub editor</a></p>' +
+      escapeHtml(githubUrl('pages/' + currentMeta.file, 'edit')) + '">2 · Open GitHub editor</a>' +
+      (after ? ' <button class="mini-btn" id="fbDone">3 · Saved — continue</button>' : '') + '</p>' +
       '<p class="editor-hint">Paste over everything there, press Commit changes. Done — same result, one extra step.</p>' +
       '<textarea readonly>' + escapeHtml(content) + '</textarea>');
     document.getElementById('fbCopy').addEventListener('click', function () {
       copyText(content, function () { showToast('Copied — paste it into the GitHub editor.'); });
     });
+    if (after) {
+      document.getElementById('fbDone').addEventListener('click', function () {
+        elDrawer.hidden = true;
+        after();
+      });
+    }
   }
 
-  function saveCommit() {
-    if (!dirty) return;
-    if (!SAVE_URL) { saveFallback(); return; }
+  function saveCommit(after) {
+    if (!dirty && editingIndex < 0) { if (after) after(); return; }
+    if (editingIndex >= 0 && !applyEditor()) return;
+    if (!dirty) { if (after) after(); return; }
+    if (!SAVE_URL) { saveFallback(after || null); return; }
     var nick = nickname();
     if (nick === null) return;
     var content = joinSections(sections);
@@ -465,6 +477,7 @@
       if (elDrawer) elDrawer.hidden = true;
       renderBody();
       showToast('Saved — live in about a minute.');
+      if (after) after();
     }).catch(function (e) {
       if (elSaveStatus) elSaveStatus.textContent = 'Unsaved changes';
       showToast('Save failed (' + String(e.message || e).slice(0, 80) + ') — try again.');
@@ -628,6 +641,54 @@
   }
 
   /* ---------- router ---------- */
+  var lastStableHash = null;
+  var pendingHash = null;
+
+  function targetPageId(hash) {
+    var m = (hash || '').match(/^#\/([^#]+)/);
+    return m ? m[1] : 'home';
+  }
+
+  // Unsaved work must never be lost to a navigation: route changes to a
+  // different page are intercepted with Save / Discard / Stay.
+  function askLeave(hash) {
+    pendingHash = hash;
+    if (!elDrawer) { // ancient cached shell: native dialog instead of nothing
+      if (window.confirm('You have unsaved changes. Leave without saving?')) {
+        pendingHash = null;
+        discardAll();
+        if (hash) location.hash = hash;
+      } else {
+        pendingHash = null;
+      }
+      return;
+    }
+    openDrawer('Unsaved changes',
+      '<p>You have edits that are not saved yet. Leaving now loses them.</p>' +
+      '<p><button class="mini-btn" id="lvSave">Save &amp; leave</button> ' +
+      '<button class="mini-btn" id="lvDiscard">Discard &amp; leave</button> ' +
+      '<button class="mini-btn" id="lvStay">Keep editing</button></p>');
+    document.getElementById('lvStay').addEventListener('click', function () {
+      pendingHash = null;
+      if (elDrawer) elDrawer.hidden = true;
+    });
+    document.getElementById('lvDiscard').addEventListener('click', function () {
+      var h = pendingHash;
+      pendingHash = null;
+      if (elDrawer) elDrawer.hidden = true;
+      discardAll();
+      if (h) location.hash = h;
+    });
+    document.getElementById('lvSave').addEventListener('click', function () {
+      if (elDrawer) elDrawer.hidden = true;
+      saveCommit(function () {
+        var h = pendingHash;
+        pendingHash = null;
+        if (h) location.hash = h;
+      });
+    });
+  }
+
   var flashRange = [];
   var flashTimer = null;
   function clearFlash() {
@@ -693,16 +754,25 @@
 
   function route() {
     var hash = location.hash || '';
+    if (pendingHash && hash === pendingHash) {
+      pendingHash = null; // approved navigation (Save/Discard & leave)
+    } else if (currentPage !== null && (dirty || editingIndex >= 0) &&
+               targetPageId(hash) !== currentPage && hash.indexOf('#sec-') !== 0) {
+      if (lastStableHash !== null) history.replaceState(null, '', lastStableHash);
+      askLeave(hash);
+      return;
+    }
     var m = hash.match(/^#\/([^#]+)#(.+)$/);
     if (m) { // page-scoped anchor (#/id#sec-N): load page, then jump
       pendingAnchor = m[2];
-      if (m[1] === currentPage) { scrollToAnchor(); return; }
+      if (m[1] === currentPage) { scrollToAnchor(); lastStableHash = hash; return; }
       bootPage(m[1]);
       return;
     }
     if (hash.indexOf('#sec-') === 0) { // bare anchor: keep current page context
       if (currentPage) {
         history.replaceState(null, '', '#/' + currentPage + hash);
+        lastStableHash = '#/' + currentPage + hash;
         scrollToAnchor(hash.slice(1));
       } else {
         bootPage('home'); // fresh load with no page context: never leave blank
@@ -781,7 +851,12 @@
     ev.preventDefault();
     pendingAnchor = null;
     history.replaceState(null, '', '#/' + m[1] + '#' + m[2]);
+    lastStableHash = '#/' + m[1] + '#' + m[2];
     jumpToSection(m[2]);
+  });
+  // Tab close / reload with unsaved work gets the browser's own warning.
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty || editingIndex >= 0) { e.preventDefault(); e.returnValue = ''; }
   });
   // Seed tab hrefs so early clicks never hit a placeholder '#'.
   elTabEdit.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME;
