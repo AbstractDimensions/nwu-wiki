@@ -144,6 +144,12 @@
   box-shadow: 0 4px 18px rgba(0,0,0,0.6); max-width: 94vw; flex-wrap: wrap;
 }
 .save-status { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #ffdcc2; }
+.nick-field {
+  background: #0e0e0e; color: #e5e2e1; border: 1px solid #4c4453;
+  font-family: 'Space Grotesk', sans-serif; font-size: 10px; letter-spacing: 0.06em;
+  padding: 0.6em 0.8em; width: 150px;
+}
+.nick-field::placeholder { color: #988d9e; }
 .save-drawer {
   position: fixed; right: 12px; bottom: 64px; z-index: 60; width: min(480px, 94vw);
   max-height: 70vh; overflow: auto; background: #201f1f; border: 1px solid #4c4453; padding: 12px;

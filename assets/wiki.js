@@ -51,6 +51,7 @@
   var elDrawerBody = document.getElementById('saveDrawerBody');
   var elDrawerClose = document.getElementById('saveDrawerClose');
   var elToast = document.getElementById('wikiToast');
+  var elNickField = document.getElementById('nickField');
   var toastTimer = null;
   var navEl = document.getElementById('wikiNav');
   var navMobileEl = document.getElementById('wikiNavMobile');
@@ -391,48 +392,21 @@
     showToast('Changes discarded.');
   }
 
-  // Nickname is OPTIONAL and remembered. First save shows an inline form
-  // (never a popup); the choice persists, anonymous included.
-  function ensureNickname(next) {
-    var nick = '', asked = false;
+  // Nickname is OPTIONAL, remembered, and lives in the save bar itself —
+  // one click saves. Whatever is in the field at save time is stored.
+  function readNickname() {
+    var nick = '';
     try {
-      nick = localStorage.getItem('nwu_nick') || '';
-      asked = localStorage.getItem('nwu_nick_set') === '1';
-    } catch (e) {}
-    if (asked) { next(nick || 'anonymous student'); return; }
-    openDrawer('Who is saving?',
-      '<p>Your edits are signed in the page history. A nickname is enough — or skip and stay anonymous.</p>' +
-      '<p><input id="nickInput" placeholder="Nickname (optional)" value="' + escapeHtml(nick) + '" style="width:70%;background:#0e0e0e;color:#e5e2e1;border:1px solid #6b3d8f;padding:6px 8px;"> ' +
-      '<button class="mini-btn" id="nickGo">Save</button></p>' +
-      '<p><a href="#" id="nickSkip">Skip — save anonymously</a> · ' +
-      '<a href="#" id="nickCancel">Cancel</a></p>');
-    var done = function (name) {
-      try {
-        localStorage.setItem('nwu_nick', name);
-        localStorage.setItem('nwu_nick_set', '1');
-      } catch (e) {}
-      if (elDrawer) elDrawer.hidden = true;
-      next(name || 'anonymous student');
-    };
-    document.getElementById('nickGo').addEventListener('click', function () {
-      var v = document.getElementById('nickInput').value.trim().slice(0, 40);
-      done(v);
-    });
-    document.getElementById('nickInput').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        var v = document.getElementById('nickInput').value.trim().slice(0, 40);
-        done(v);
+      if (elNickField && elNickField.value.trim()) {
+        nick = elNickField.value.trim().slice(0, 40);
+      } else {
+        nick = localStorage.getItem('nwu_nick') || '';
       }
-      e.stopPropagation();
-    });
-    document.getElementById('nickSkip').addEventListener('click', function (e) {
-      e.preventDefault();
-      done('');
-    });
-    document.getElementById('nickCancel').addEventListener('click', function (e) {
-      e.preventDefault();
-      if (elDrawer) elDrawer.hidden = true;
-    });
+      localStorage.setItem('nwu_nick', nick);
+      localStorage.setItem('nwu_nick_set', '1');
+      if (elNickField) elNickField.value = nick;
+    } catch (e) {}
+    return nick || 'anonymous student';
   }
 
   function copyText(text, done) {
@@ -479,7 +453,7 @@
     if (editingIndex >= 0 && !applyEditor()) return;
     if (!dirty) { if (after) after(); return; }
     if (!SAVE_URL) { saveFallback(after || null); return; }
-    ensureNickname(function (nick) { postSave(nick, after); });
+    postSave(readNickname(), after);
   }
 
   function postSave(nick, after) {
@@ -920,6 +894,10 @@
   // Seed tab hrefs so early clicks never hit a placeholder '#'.
   elTabEdit.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME;
   elTabHistory.href = 'https://github.com/' + REPO_OWNER + '/' + REPO_NAME + '/commits/main';
+  // Prefill the save-bar nickname from the remembered choice.
+  try {
+    if (elNickField) elNickField.value = localStorage.getItem('nwu_nick') || '';
+  } catch (e) {}
   loadIndex().then(route);
   initSearch();
 })();
