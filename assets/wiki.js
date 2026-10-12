@@ -102,7 +102,7 @@
       : Object.keys(cats).map(function (c) { return { id: c, icon: 'folder' }; });
     var html = '';
     order.forEach(function (cat) {
-      var list = cats[cat.id] || [];
+      var list = (cats[cat.id] || []).filter(function(p) { return !p.sample; });
       html += '<div class="nav-cat">' + escapeHtml(cat.id) + '</div>';
       list.forEach(function (p) {
         html += '<a class="nav-item" data-page="' + escapeHtml(p.id) + '" href="#/' + escapeHtml(p.id) + '">' +
@@ -121,7 +121,7 @@
     Object.keys(cats).forEach(function (c) {
       if (order.some(function (o) { return o.id === c; })) return;
       html += '<div class="nav-cat">' + escapeHtml(c) + '</div>';
-      cats[c].forEach(function (p) {
+      cats[c].filter(function(p) { return !p.sample; }).forEach(function(p) {
         html += '<a class="nav-item" data-page="' + escapeHtml(p.id) + '" href="#/' + escapeHtml(p.id) + '">' +
           '<span class="material-symbols-outlined">' + escapeHtml(p.icon || 'article') + '</span>' +
           '<span class="truncate">' + escapeHtml(p.title) + '</span></a>';
@@ -218,6 +218,10 @@
    * editors never touch markup for it — prime directive. Missing photo
    * renders as an "add a photo" invitation: the easiest first contribution. */
   function infoboxHtml(meta) {
+        // Skip infobox for home page (special landing page)
+    if (meta.id === 'home') return '';
+        // Skip infobox for home page (special landing page)
+    if (meta.id === 'home') return '';
     if (!meta.infobox) return '';
     var ib = meta.infobox;
     var photo = ib.image

@@ -333,6 +333,327 @@
         "infobox"
       ],
       "updated": "2026-10-12"
+    },
+    {
+      "id": "example-lecturer",
+      "title": "Dr. Example Lecturer (template)",
+      "category": "Lecturers",
+      "icon": "person",
+      "file": "example-lecturer.md",
+      "desc": "Sample lecturer page: classes, consultation hours, assessment style",
+      "keywords": [
+        "lecturer",
+        "cmpg",
+        "programming",
+        "consultation"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "Sample lecturer profile",
+        "fields": [
+          [
+            "Faculty",
+            "Natural and Agricultural Sciences (example)"
+          ],
+          [
+            "Campus",
+            "Potchefstroom (example)"
+          ],
+          [
+            "Office",
+            "Building G12, Room 304 (example)"
+          ],
+          [
+            "Email",
+            "via eFundi Messages (example)"
+          ],
+          [
+            "Classes",
+            "CMPG 111 · CMPG 121 · CMPG 211 (example)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-place",
+      "title": "Student Centre (template)",
+      "category": "Places",
+      "icon": "restaurant",
+      "file": "example-place.md",
+      "desc": "Sample place page: food, parking, best times",
+      "keywords": [
+        "food",
+        "parking",
+        "potchefstroom",
+        "centre"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "Main food-and-services building, Potchefstroom (example)",
+        "fields": [
+          [
+            "Campus",
+            "Potchefstroom (example)"
+          ],
+          [
+            "Building",
+            "Central walkway, north side (example)"
+          ],
+          [
+            "Hours",
+            "Mon–Fri 07:30–17:00, see article (example)"
+          ],
+          [
+            "Parking",
+            "Front lot fills by 08:15 (example)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-residence",
+      "title": "Villagers Residence (template)",
+      "category": "Residences",
+      "icon": "home",
+      "file": "example-residence.md",
+      "desc": "Sample residence page: rooms, rules, how to apply",
+      "keywords": [
+        "residence",
+        "villagers",
+        "potchefstroom",
+        "apply"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "Main residence, Potchefstroom (example)",
+        "fields": [
+          [
+            "Campus",
+            "Potchefstroom (example)"
+          ],
+          [
+            "Building",
+            "Central walkway, north side (example)"
+          ],
+          [
+            "Hours",
+            "Mon–Fri 07:30–17:00, see article (example)"
+          ],
+          [
+            "Parking",
+            "Front lot fills by 08:15 (example)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-module",
+      "title": "INGM 122 (template)",
+      "category": "Modules",
+      "icon": "draw",
+      "file": "example-module.md",
+      "desc": "Sample module page: kit list, assessment, traps",
+      "keywords": [
+        "ingm122",
+        "engineering",
+        "drawing",
+        "graphics"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "Engineering Graphics and Design",
+        "fields": [
+          [
+            "Code",
+            "INGM 122"
+          ],
+          [
+            "Faculty",
+            "Engineering"
+          ],
+          [
+            "Credits",
+            "12 (illustrative)"
+          ],
+          [
+            "Synced notes",
+            "eFundiHax hub"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-program",
+      "title": "BSc Computer Science (template)",
+      "category": "University Programs",
+      "icon": "school",
+      "file": "example-program.md",
+      "desc": "Sample programme page: curriculum, admission, careers",
+      "keywords": [
+        "bsc",
+        "computer science",
+        "admission",
+        "careers"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "Bachelor of Science in Computer Science",
+        "fields": [
+          [
+            "Code",
+            "200128"
+          ],
+          [
+            "Faculty",
+            "Natural & Agricultural Sciences"
+          ],
+          [
+            "Duration",
+            "3 years"
+          ],
+          [
+            "Qualification",
+            "BSc"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-society",
+      "title": "NWU Chess Club (template)",
+      "category": "Societies",
+      "icon": "groups",
+      "file": "example-society.md",
+      "desc": "Sample society page: how to join, meetings, membership",
+      "keywords": [
+        "chess",
+        "society",
+        "club",
+        "join"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "Chess club, Potchefstroom campus",
+        "fields": [
+          [
+            "Type",
+            "Academic / recreational"
+          ],
+          [
+            "Campus",
+            "Potchefstroom"
+          ],
+          [
+            "Meeting",
+            "Wed 17:30, Building F10 Room 201"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-event",
+      "title": "Rag Week (template)",
+      "category": "Traditions & Events",
+      "icon": "celebration",
+      "file": "example-event.md",
+      "desc": "Sample event page: what happens, when, history",
+      "keywords": [
+        "rag week",
+        "tradition",
+        "charity",
+        "potchefstroom"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "Rag Week, Potchefstroom campus",
+        "fields": [
+          [
+            "When",
+            "First week of March (Mon–Fri)"
+          ],
+          [
+            "Campus",
+            "Potchefstroom"
+          ],
+          [
+            "Main venue",
+            "Main quad & amphitheatre"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-glossary",
+      "title": "Wildcat (template)",
+      "category": "Glossary",
+      "icon": "local_drink",
+      "file": "example-glossary.md",
+      "desc": "Sample one-off page: the unofficial energy drink",
+      "keywords": [
+        "drink",
+        "wildcat",
+        "caffeine",
+        "tuck shop"
+      ],
+      "sample": true,
+      "updated": "2025-06-01",
+      "infobox": {
+        "caption": "Unofficial drink of the all-nighter (example)",
+        "fields": [
+          [
+            "Type",
+            "Canned energy drink"
+          ],
+          [
+            "Variants",
+            "Original, sugar-free (unconfirmed)"
+          ],
+          [
+            "Found at",
+            "Tuck shops, vending machines (example)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "example-guide",
+      "title": "First Weeks Guide (template)",
+      "category": "Guides",
+      "icon": "map",
+      "file": "example-guide.md",
+      "desc": "Sample guide page: first weeks, wifi, student card",
+      "keywords": [
+        "guide",
+        "first weeks",
+        "wifi",
+        "student card"
+      ],
+      "sample": true,
+      "updated": "2026-10-12",
+      "infobox": {
+        "caption": "First weeks survival guide (example)",
+        "fields": [
+          [
+            "Audience",
+            "Incoming first-years (example)"
+          ],
+          [
+            "Campus",
+            "Potchefstroom (example)"
+          ],
+          [
+            "Last checked",
+            "October 2026 (example)"
+          ]
+        ]
+      }
     }
   ]
 }
