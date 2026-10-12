@@ -52,6 +52,12 @@
   var elDrawerClose = document.getElementById('saveDrawerClose');
   var elToast = document.getElementById('wikiToast');
   var elNickField = document.getElementById('nickField');
+  var elCreateDrawer = document.getElementById('createDrawer');
+  var elCreateStep1 = document.getElementById('createStep1');
+  var elCreateStep2 = document.getElementById('createStep2');
+  var elCreateCats = document.getElementById('createCats');
+  var elCreateTitle = document.getElementById('createTitle');
+  var elCreateSlug = document.getElementById('createSlugPreview');
   var toastTimer = null;
   var navEl = document.getElementById('wikiNav');
   var navMobileEl = document.getElementById('wikiNavMobile');
@@ -597,6 +603,83 @@
     }
   }
 
+  /* ---------- create page (template-forced) ---------- */
+  var CREATE_CATEGORIES = [
+    { id: 'Guides', icon: 'map' },
+    { id: 'Modules', icon: 'menu_book' },
+    { id: 'Lecturers', icon: 'person' },
+    { id: 'Places', icon: 'location_on' },
+    { id: 'Residences', icon: 'home' },
+    { id: 'University Programs', icon: 'school' },
+    { id: 'Societies', icon: 'groups' },
+    { id: 'Traditions & Events', icon: 'celebration' },
+    { id: 'Glossary', icon: 'abc' }
+  ];
+  var createCat = null;
+
+  function openCreatePage() {
+    if (!elCreateDrawer) return;
+    createCat = null;
+    elCreateStep1.hidden = false;
+    elCreateStep2.hidden = true;
+    elCreateTitle.value = '';
+    elCreateSlug.textContent = '';
+    elCreateCats.innerHTML = CREATE_CATEGORIES.map(function (c) {
+      return '<button class="create-cat-btn" data-cat="' + escapeHtml(c.id) + '">' +
+        '<span class="material-symbols-outlined">' + escapeHtml(c.icon) + '</span>' +
+        escapeHtml(c.id) + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(elCreateCats.querySelectorAll('.create-cat-btn'), function (btn) {
+      btn.addEventListener('click', function () {
+        createCat = btn.getAttribute('data-cat');
+        elCreateStep1.hidden = true;
+        elCreateStep2.hidden = false;
+        elCreateTitle.focus();
+      });
+    });
+    elCreateDrawer.hidden = false;
+  }
+
+  function createPageGo() {
+    if (!createCat) return;
+    var title = elCreateTitle.value.trim().slice(0, 80);
+    if (!title) { showToast('Give the page a title.'); return; }
+    var slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    if (slug.length < 3) { showToast('Title too short for a slug — use more letters.'); return; }
+    var nick = 'anonymous student';
+    try { nick = (elNickField && elNickField.value.trim()) || localStorage.getItem('nwu_nick') || nick; } catch (e) {}
+    console.log('[nwu-wiki] create page', { category: createCat, title: title, slug: slug });
+    if (elCreateDrawer) elCreateDrawer.hidden = true;
+    showToast('Creating page…');
+    // text/plain: CORS-simple, no preflight
+    fetch(SAVE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'create_wiki_page',
+        key: WRITE_KEY,
+        category: createCat,
+        title: title,
+        slug: slug,
+        nickname: nick
+      })
+    }).then(function (r) {
+      return r.json().then(function (j) { return { status: r.status, body: j }; });
+    }).then(function (res) {
+      console.log('[nwu-wiki] create response', res.body);
+      if (!res.body || !res.body.ok) {
+        showToast('Create failed: ' + ((res.body && res.body.error) || ('HTTP ' + res.status)));
+        return;
+      }
+      // Navigate to the new page — it loads with the template pre-filled
+      location.hash = '#/' + slug;
+      showToast('Page created — click any section to start editing.');
+    }).catch(function (e) {
+      console.error('[nwu-wiki] create FAILED', e);
+      showToast('Create failed: ' + String((e && e.message) || e).slice(0, 120));
+    });
+  }
+
   function stubRibbon() {
     return '<div class="mt-8 bevel-out bg-surface-container p-4 text-xs text-outline font-body">' +
       '<span class="material-symbols-outlined text-secondary text-sm align-middle">construction</span> ' +
@@ -897,6 +980,29 @@
   if (elSaveCommit) elSaveCommit.addEventListener('click', function () { saveCommit(); });
   if (elSaveDiscard) elSaveDiscard.addEventListener('click', discardAll);
   if (elDrawerClose) elDrawerClose.addEventListener('click', function () { elDrawer.hidden = true; });
+  // Create-page flow
+  if (elCreateDrawer) {
+    document.getElementById('createClose').addEventListener('click', function () { elCreateDrawer.hidden = true; });
+    document.getElementById('createBack').addEventListener('click', function () {
+      elCreateStep1.hidden = false; elCreateStep2.hidden = true;
+    });
+    document.getElementById('createGo').addEventListener('click', createPageGo);
+    elCreateTitle.addEventListener('input', function () {
+      var s = elCreateTitle.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      elCreateSlug.textContent = s || '…';
+    });
+    elCreateTitle.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') createPageGo();
+      e.stopPropagation();
+    });
+  }
+  // Sidebar "Add a page" + empty-category links → in-app create flow
+  Array.prototype.forEach.call(document.querySelectorAll('a[href*="/new/main/pages"], a.nav-empty'), function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      openCreatePage();
+    });
+  });
   // TOC clicks: take over from the native top-jump so the heading lands
   // centered with a flash. URL still updates for sharing (no history spam).
   elBody.addEventListener('click', function (ev) {

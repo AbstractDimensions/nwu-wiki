@@ -152,6 +152,27 @@
   padding: 0.6em 0.8em; width: 150px;
 }
 .nick-field::placeholder { color: #988d9e; }
+
+/* ===== Create-page drawer ===== */
+.create-drawer {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 12px; z-index: 65;
+  width: min(640px, 94vw); max-height: 70vh; overflow: auto;
+  background: #201f1f; border: 1px solid #6b3d8f; padding: 14px 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.65);
+}
+.create-cat-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px; margin-top: 10px;
+}
+.create-cat-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: #2a2a2a; border: 1px solid #4c4453; color: #c9c6c4;
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; padding: 12px 6px;
+  cursor: pointer; text-align: center;
+}
+.create-cat-btn:hover { background: #353534; border-color: #6b3d8f; color: #f0dbff; }
+.create-cat-btn .material-symbols-outlined { font-size: 22px; color: #dbb9fa; }
 .save-drawer {
   position: fixed; right: 12px; bottom: 64px; z-index: 60; width: min(480px, 94vw);
   max-height: 70vh; overflow: auto; background: #201f1f; border: 1px solid #4c4453; padding: 12px;

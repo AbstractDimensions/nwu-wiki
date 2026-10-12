@@ -18,6 +18,24 @@ var WRITE_KEY_DEFAULT = 'nwu-wiki-write';
 var MAX_BYTES = 200000;
 var RATE_PER_MIN = 10;
 
+// Canonical categories + sidebar icons. Unknown categories are rejected.
+var CATEGORIES = {
+  'Guides': 'map',
+  'Modules': 'menu_book',
+  'Lecturers': 'person',
+  'Places': 'location_on',
+  'Residences': 'home',
+  'University Programs': 'school',
+  'Societies': 'groups',
+  'Traditions & Events': 'celebration',
+  'Glossary': 'abc'
+};
+
+function todayUtc_() {
+  var d = new Date();
+  return d.getUTCFullYear() + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + d.getUTCDate()).slice(-2);
+}
+
 function props() {
   return PropertiesService.getScriptProperties();
 }
@@ -93,8 +111,11 @@ function doPost(e) {
       props().deleteProperty('GITHUB_PAT');
       return jsonOut({ ok: true, reset: 'GITHUB_PAT' });
     }
-    if (p.action !== 'save_wiki_page') {
+    if (p.action !== 'save_wiki_page' && p.action !== 'create_wiki_page') {
       return jsonOut({ ok: false, error: 'unknown action' });
+    }
+    if (p.action === 'create_wiki_page') {
+      return createWikiPage_(p);
     }
     var writeKey = props().getProperty('WRITE_KEY') || WRITE_KEY_DEFAULT;
     if (p.key !== writeKey) {
@@ -161,10 +182,75 @@ function doPost(e) {
   }
 }
 
+/* Create a new wiki page from a category template.
+ * Validates category + slug, builds initial content, commits. */
+function createWikiPage_(p) {
+  var cat = String(p.category || '');
+  if (!CATEGORIES[cat]) {
+    return jsonOut({ ok: false, error: 'unknown category: ' + cat });
+  }
+  var title = String(p.title || '').trim().slice(0, 80);
+  if (!title) return jsonOut({ ok: false, error: 'title required' });
+  var slug = String(p.slug || '').trim().toLowerCase().replace(/[^a-z0-9\-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  if (!slug || slug.length < 3) return jsonOut({ ok: false, error: 'slug must be 3+ chars (a-z, 0-9, dashes)' });
+  var file = 'pages/' + slug + '.md';
+  var cur = gh_('/repos/' + REPO + '/contents/' + file, 'get');
+  if (cur.code === 200) return jsonOut({ ok: false, error: 'page already exists: ' + file });
+  if (cur.code !== 404) return jsonOut({ ok: false, error: 'GitHub check failed: HTTP ' + cur.code });
+  var content = buildTemplate_(cat, title, slug);
+  var nick = String(p.nickname || 'anonymous student').slice(0, 40).replace(/[\r\n]+/g, ' ');
+  var put = gh_('/repos/' + REPO + '/contents/' + file, 'put', {
+    message: 'Create ' + title + ' (via wiki: ' + nick + ')',
+    content: Utilities.base64Encode(content, Utilities.Charset.UTF_8)
+  });
+  if (put.code !== 200 && put.code !== 201) {
+    var ghMsg2 = '';
+    try { ghMsg2 = ': ' + (JSON.parse(put.body).message || ''); } catch (e3) {}
+    return jsonOut({ ok: false, error: 'GitHub write failed: HTTP ' + put.code + ghMsg2.slice(0, 160) });
+  }
+  var putJ = JSON.parse(put.body);
+  return jsonOut({
+    ok: true,
+    file: file,
+    slug: slug,
+    category: cat,
+    commit: putJ.commit && putJ.commit.html_url,
+    sha: putJ.content && putJ.content.sha
+  });
+}
+
+/* Build initial page content from the category template. */
+function buildTemplate_(cat, title, slug) {
+  var lines = ['# ' + title, ''];
+  var sections = TEMPLATES[cat] || [];
+  sections.forEach(function (s) {
+    lines.push('## ' + s, '');
+    lines.push('> [!note] This section is a placeholder — click it to edit.');
+    lines.push('');
+  });
+  lines.push('---');
+  lines.push('');
+  lines.push('*Created from the ' + cat + ' template. Fill in each section, then Save to wiki.*');
+  lines.push('');
+  return lines.join('\n');
+}
+
+/* Default sections per category (mirrors pages/category-templates.md). */
+var TEMPLATES = {
+  'Guides': ['Overview', 'Step-by-step', 'Tips', 'See also'],
+  'Modules': ['What the module covers', 'Assessment breakdown', 'Lecturers', 'How to pass', 'Known traps', 'Links', 'Resources'],
+  'Lecturers': ['Classes', 'Consultation', 'Assessment style', 'Teaching style'],
+  'Places': ['Getting there', 'Hours', 'Services & prices', 'Tips'],
+  'Residences': ['Overview', 'Rooms & facilities', 'Rules & culture', 'How to apply', 'Tips'],
+  'University Programs': ['Overview', 'Curriculum structure', 'Admission requirements', 'Career paths', 'Links'],
+  'Societies': ['About', 'How to join', 'Meetings & activities', 'Membership'],
+  'Traditions & Events': ['What happens', 'When & where', 'History', 'Tips for first-timers'],
+  'Glossary': ['Meaning', 'Details', 'See also']
+};
+
 /* One-time secret setup. Run via: clasp run setupStore --params '[{"k":"GITHUB_PAT","v":"..."}]'
  * Params never touch disk. Delete the chat/command trace afterwards. */
-function setupStore(req) {
-  var items = (req && req.k) ? [req] : (req || []);
+function setupStore(req) {  var items = (req && req.k) ? [req] : (req || []);
   var out = [];
   var ps = props();
   items.forEach(function (it) {

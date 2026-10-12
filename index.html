@@ -165,6 +165,27 @@ tailwind.config = {
   <div id="saveDrawerBody" class="save-drawer-body"></div>
 </div>
 <div id="wikiToast" class="wiki-toast" hidden></div>
-<script src="assets/wiki.js?v=20261012e"></script>
+<div id="createDrawer" class="create-drawer" hidden>
+  <div class="save-drawer-head">
+    <strong>New wiki page</strong>
+    <button id="createClose" class="mini-btn" title="Close">✕</button>
+  </div>
+  <div class="create-drawer-body">
+    <div id="createStep1">
+      <p class="editor-hint">Pick a category — this sets the page's template (sections + infobox shape).</p>
+      <div id="createCats" class="create-cat-grid"></div>
+    </div>
+    <div id="createStep2" hidden>
+      <p class="editor-hint">Name your page. The slug is auto-generated from the title.</p>
+      <input id="createTitle" placeholder="e.g. Villagers Residence" class="nick-field" style="width:100%">
+      <p class="editor-hint">Slug: <code id="createSlugPreview"></code></p>
+      <div class="editor-row">
+        <button class="editor-btn editor-apply" id="createGo">Create page</button>
+        <button class="editor-btn editor-cancel" id="createBack">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="assets/wiki.js?v=20261012f"></script>
 </body>
 </html>
