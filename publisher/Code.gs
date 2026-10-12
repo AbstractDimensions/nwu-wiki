@@ -120,6 +120,14 @@ function doPost(e) {
       return jsonOut({ ok: false, error: 'GitHub read failed: HTTP ' + cur.code });
     }
     var curJ = JSON.parse(cur.body);
+    // No-op guard: identical content returns ok WITHOUT an empty commit.
+    // (Retries and double-saves must not pollute history.)
+    try {
+      var curText = Utilities.newBlob(Utilities.base64Decode(curJ.content.replace(/\n/g, ''))).getDataAsString();
+      if (curText === content) {
+        return jsonOut({ ok: true, commit: null, sha: curJ.sha, noop: true });
+      }
+    } catch (e2) {}
     if (p.baseSha && p.baseSha !== curJ.sha) {
       var latest = Utilities.base64Decode(curJ.content.replace(/\n/g, ''));
       return jsonOut({
