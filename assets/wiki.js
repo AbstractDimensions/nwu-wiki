@@ -1062,7 +1062,14 @@
     });
   }
   // Sidebar "Add a page" + empty-category links → in-app create flow
-  document.getElementById('addPageBtn').addEventListener('click', openCreatePage);
+  var addBtn = document.getElementById('addPageBtn');
+  if (addBtn) addBtn.addEventListener('click', openCreatePage);
+  var addBtnMobile = document.getElementById('addPageBtnMobile');
+  if (addBtnMobile) addBtnMobile.addEventListener('click', function () {
+    var d = addBtnMobile.closest('details');
+    if (d) d.open = false;
+    openCreatePage();
+  });
   Array.prototype.forEach.call(document.querySelectorAll('a[href*="/new/main/pages"], a.nav-empty'), function (a) {
     a.addEventListener('click', function (e) {
       e.preventDefault();
