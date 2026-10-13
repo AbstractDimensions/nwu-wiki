@@ -1,21 +1,3 @@
----
-id: example-lecturer
-title: "Dr. Example Lecturer (template)"
-category: "Lecturers"
-icon: "person"
-file: "example-lecturer.md"
-sample: true
-updated: "2026-10-12"
-infobox:
-  caption: "Sample lecturer profile"
-  fields:
-    - ["Faculty", "Natural and Agricultural Sciences (example)"]
-    - ["Campus", "Potchefstroom (example)"]
-    - ["Office", "Building G12, Room 304 (example)"]
-    - ["Email", "lecturer@nwu.ac.za (official)"]
-    - ["Classes", "CMPG 111 · CMPG 121 · CMPG 211 (example)"]
----
-
 # Dr. Example Lecturer (template)
 
 > [!note]

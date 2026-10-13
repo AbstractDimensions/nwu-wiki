@@ -1,19 +1,3 @@
----
-id: example-guide
-title: "First Weeks Guide (template)"
-category: "Guides"
-icon: "map"
-file: "example-guide.md"
-sample: true
-updated: "2026-10-11"
-infobox:
-  caption: "First weeks survival guide (example)"
-  fields:
-    - ["Audience", "Incoming first-years"]
-    - ["Campus", "Potchefstroom (example)"]
-    - ["Last updated", "February 2025 (example)"]
----
-
 # First Weeks Guide (template)
 
 > [!note]

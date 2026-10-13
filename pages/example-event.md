@@ -1,19 +1,3 @@
----
-id: example-event
-title: "Rag Week (template)"
-category: "Traditions & Events"
-icon: "celebration"
-file: "example-event.md"
-sample: true
-updated: "2026-10-12"
-infobox:
-  caption: "Rag Week, Potchefstroom campus"
-  fields:
-    - ["When", "First week of March (Mon–Fri)"]
-    - ["Campus", "Potchefstroom"]
-    - ["Main venue", "Main quad & amphitheatre"]
----
-
 # Rag Week (template)
 
 > [!note]

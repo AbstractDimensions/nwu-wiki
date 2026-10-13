@@ -1,20 +1,3 @@
----
-id: example-place
-title: "Student Centre (template)"
-category: "Places"
-icon: "restaurant"
-file: "example-place.md"
-sample: true
-updated: "2026-10-12"
-infobox:
-  caption: "Main food-and-services building, Potchefstroom (example)"
-  fields:
-    - ["Campus", "Potchefstroom (example)"]
-    - ["Building", "Central walkway, north side (example)"]
-    - ["Hours", "Mon–Fri 07:30–17:00, see article (example)"]
-    - ["Parking", "Front lot fills by 08:15 (example)"]
----
-
 # Student Centre (template)
 
 > [!note]

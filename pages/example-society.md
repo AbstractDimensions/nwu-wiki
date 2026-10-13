@@ -1,19 +1,3 @@
----
-id: example-society
-title: "NWU Chess Club (template)"
-category: "Societies"
-icon: "groups"
-file: "example-society.md"
-sample: true
-updated: "2026-10-12"
-infobox:
-  caption: "Chess club, Potchefstroom campus"
-  fields:
-    - ["Type", "Academic / recreational"]
-    - ["Campus", "Potchefstroom"]
-    - ["Meeting", "Wed 17:30, Building F10 Room 201"]
----
-
 # NWU Chess Club (template)
 
 > [!note]

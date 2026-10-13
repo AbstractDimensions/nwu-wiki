@@ -1,20 +1,3 @@
----
-id: example-program
-title: "BSc Computer Science (template)"
-category: "University Programs"
-icon: "school"
-file: "example-program.md"
-sample: true
-updated: "2026-10-12"
-infobox:
-  caption: "Bachelor of Science in Computer Science"
-  fields:
-    - ["Code", "200128"]
-    - ["Faculty", "Natural & Agricultural Sciences"]
-    - ["Duration", "3 years"]
-    - ["Qualification", "BSc"]
----
-
 # BSc Computer Science (template)
 
 > [!note]

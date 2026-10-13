@@ -1,20 +1,3 @@
----
-id: example-residence
-title: "Villagers Residence (template)"
-category: "Residences"
-icon: "home"
-file: "example-residence.md"
-sample: true
-updated: "2026-10-12"
-infobox:
-  caption: "Main residence, Potchefstroom (example)"
-  fields:
-    - ["Campus", "Potchefstroom (example)"]
-    - ["Building", "Central walkway, north side (example)"]
-    - ["Hours", "Mon–Fri 07:30–17:00, see article (example)"]
-    - ["Parking", "Front lot fills by 08:15 (example)"]
----
-
 # Villagers Residence (template)
 
 > [!note]

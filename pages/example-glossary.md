@@ -1,19 +1,3 @@
----
-id: example-glossary
-title: "Wildcat (template)"
-category: "Glossary"
-icon: "local_drink"
-file: "example-glossary.md"
-sample: true
-updated: "2025-06-01"
-infobox:
-  caption: "Unofficial drink of the all-nighter (example)"
-  fields:
-    - ["Type", "Canned energy drink"]
-    - ["Variants", "Original, sugar-free (unconfirmed)"]
-    - ["Found at", "Tuck shops, vending machines (example)"]
----
-
 # Wildcat (template)
 
 > [!note]

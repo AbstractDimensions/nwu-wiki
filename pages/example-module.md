@@ -1,20 +1,3 @@
----
-id: example-module
-title: "INGM 122 (template)"
-category: "Modules"
-icon: "draw"
-file: "example-module.md"
-sample: true
-updated: "2026-10-12"
-infobox:
-  caption: "Engineering Graphics and Design"
-  fields:
-    - ["Code", "INGM 122"]
-    - ["Faculty", "Engineering"]
-    - ["Credits", "12 (illustrative)"]
-    - ["Synced notes", "eFundiHax hub"]
----
-
 # INGM 122 (template)
 
 > [!note]
