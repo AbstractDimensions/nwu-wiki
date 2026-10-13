@@ -32,7 +32,6 @@
   } catch (e) { SAVE_URL = ''; }
 
   var elTitle = document.getElementById('pageTitle');
-  var elCat = document.getElementById('pageCategory');
   var elIcon = document.getElementById('pageIcon');
   var elBody = document.getElementById('pageBody');
   var elEdit = document.getElementById('editBtn');
@@ -152,13 +151,12 @@
     markActiveNav();
 
     elTitle.textContent = meta.title;
-    elCat.textContent = meta.category || 'wiki';
     elIcon.textContent = meta.icon || 'article';
-    elEdit.href = githubUrl('pages/' + meta.file, 'edit');
+    if (elEdit) elEdit.href = githubUrl('pages/' + meta.file, 'edit');
     elHistory.href = githubUrl('pages/' + meta.file, 'commits');
     elTabArticle.href = '#/' + id;
     elTabArticle.setAttribute('aria-current', 'page');
-    elTabEdit.href = githubUrl('pages/' + meta.file, 'edit');
+    if (elTabEdit) elTabEdit.href = githubUrl('pages/' + meta.file, 'edit');
     elTabHistory.href = githubUrl('pages/' + meta.file, 'commits');
     document.title = meta.title + ' — NWU Wiki';
 
@@ -758,7 +756,6 @@
   function renderNotFound(id) {
     currentPage = null;
     elTitle.textContent = 'Page not found';
-    elCat.textContent = '404';
     elBody.innerHTML = '<p class="text-on-surface">No wiki page with id <code>' + escapeHtml(id) + '</code>.</p>' +
       '<p class="text-outline text-xs mt-2">Pick a page from the sidebar, or <a class="text-secondary underline" href="#/home">go home</a>.</p>';
   }
