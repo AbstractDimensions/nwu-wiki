@@ -95,6 +95,17 @@ community's to-do list:
 - **Campus Life** — needs everything.
 - **First Weeks Guide** — what confused *you* in week 1 is missing here.
 
+## Example pages (reference only — not editable)
+
+Every category has one finished example showing exactly what a good page looks
+like. Open one before writing yours:
+
+- [Lecturers example](#/example-lecturer) · [Places example](#/example-place) ·
+  [Residences example](#/example-residence) · [Modules example](#/example-module) ·
+  [Programs example](#/example-program) · [Societies example](#/example-society) ·
+  [Traditions example](#/example-event) · [Glossary example](#/example-glossary) ·
+  [Guides example](#/example-guide)
+
 ## Not sure, or found a bug in the wiki itself?
 
 - **Content question:** edit the page and ask in your commit message.
