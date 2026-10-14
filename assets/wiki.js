@@ -146,7 +146,19 @@
   /* ---------- page rendering ---------- */
   function loadPage(id) {
     var meta = pagesIndex.filter(function (p) { return p.id === id; })[0];
-    if (!meta || !meta.file) { renderNotFound(id); return; }
+    var optimistic = false;
+    if (!meta || !meta.file) {
+      // Not in the local index (stale pages.json after a fresh create, or a
+      // shared link) — resolve the file directly instead of 404ing.
+      meta = synthesizeMeta(id);
+      optimistic = true;
+    }
+    // A deploy banner belongs to its own page; drop it when moving elsewhere.
+    var oldBanner = document.getElementById('deployBanner');
+    if (oldBanner && oldBanner.getAttribute('data-slug') !== id) {
+      oldBanner.remove();
+      stopDeployWatch();
+    }
     currentPage = id;
     markActiveNav();
 
@@ -176,25 +188,28 @@
       history.replaceState(null, '', wantHash);
     }
 
-    fetch('pages/' + encodeURIComponent(meta.file), { cache: 'no-store' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.text();
-      })
-      .then(function (md) {
+    fetchPageContent(meta.file)
+      .then(function (res) {
+        var md = res.md;
         currentMeta = meta;
         currentMarkdown = md;
         sections = splitSections(md);
         editingIndex = -1;
         dirty = false;
-        currentSha = null;
+        currentSha = res.sha;
+        if (optimistic) {
+          // New page visible before the index refreshes: adopt it locally.
+          pagesIndex.unshift(meta);
+          try { renderNav(); } catch (e) {}
+        }
         updateSaveBar();
         renderBody();
-        fetchSha(meta);
+        if (!res.sha) fetchSha(meta);
         lastStableHash = location.hash;
         if (pendingAnchor) scrollToAnchor(); else window.scrollTo(0, 0);
       })
       .catch(function (e) {
+        if (optimistic) { renderNotFound(id); return; }
         console.error('[nwu-wiki] page load FAILED', { file: meta.file, error: String(e) });
         // Page exists in index but not yet on GitHub Pages — show friendly message with retry
         elBody.innerHTML = '<div class="text-error text-sm font-label uppercase tracking-widest">' +
@@ -329,50 +344,71 @@
 
   function showDeployBanner(slug, after) {
     console.log('[nwu-wiki] showDeployBanner called for slug:', slug);
+    var old = document.getElementById('deployBanner');
+    if (old) old.remove();
     var banner = document.createElement('div');
     banner.id = 'deployBanner';
     banner.className = 'deploy-banner';
+    banner.setAttribute('data-slug', slug);
     banner.innerHTML = '<div class="deploy-banner-content">' +
       '<span class="material-symbols-outlined deploy-spin">cloud_upload</span>' +
-      '<span class="deploy-text">Page created! Deploying to live site (usually 1\u20132 minutes). You can keep editing here.</span>' +
-      '<button class="deploy-check" data-slug="' + escapeHtml(slug) + '" title="Check if live">Check if live</button>' +
-      (after ? '<button class="deploy-continue">Continue editing</button>' : '') +
+      '<span class="deploy-text" id="deployText">Publishing\u2026 check 1 \u2014 updating status.</span>' +
       '</div>';
     document.body.appendChild(banner);
     console.log('[nwu-wiki] deploy banner appended to body');
-    banner.querySelector('.deploy-check').addEventListener('click', function () {
-      checkPageLive(slug, this);
-    });
     if (after) {
-      banner.querySelector('.deploy-continue').addEventListener('click', function () {
+      var cont = document.createElement('button');
+      cont.className = 'deploy-continue';
+      cont.textContent = 'Continue editing';
+      cont.addEventListener('click', function () {
         var b = document.getElementById('deployBanner');
         if (b) b.remove();
+        stopDeployWatch();
         if (after) after();
       });
+      banner.querySelector('.deploy-banner-content').appendChild(cont);
     }
   }
 
-  function checkPageLive(slug, btn) {
-    btn.disabled = true;
-    btn.textContent = 'Checking\u2026';
-    fetch('pages/' + encodeURIComponent(slug) + '.md', { cache: 'no-store' })
-      .then(function (r) {
-        if (r.ok) {
-          // Remove the deploy banner before navigating
-          var banner = document.getElementById('deployBanner');
-          if (banner) banner.remove();
-          location.hash = '#/' + slug;
-        } else {
-          btn.disabled = false;
-          btn.textContent = 'Check if live';
-          showToast('Still deploying\u2026 check again in a minute.');
-        }
-      })
-      .catch(function () {
-        btn.disabled = false;
-        btn.textContent = 'Check if live';
-        showToast('Could not check \u2014 try again in a moment.');
-      });
+  /* Deploy watcher: polls the static file with backoff and auto-navigates
+   * the moment Pages serves it. Replaces the old manual "check if live". */
+  var deployTimer = null;
+  var deployChecks = 0;
+  function stopDeployWatch() {
+    if (deployTimer) { clearTimeout(deployTimer); deployTimer = null; }
+    deployChecks = 0;
+  }
+  function startDeployWatch(slug) {
+    stopDeployWatch();
+    var delays = [10000, 15000, 20000, 30000, 30000, 45000, 45000, 60000, 60000, 60000];
+    var attempt = function () {
+      deployChecks++;
+      var txt = document.getElementById('deployText');
+      fetch('pages/' + encodeURIComponent(slug) + '.md', { cache: 'no-store' })
+        .then(function (r) {
+          if (r.ok) {
+            console.log('[nwu-wiki] page live on attempt', deployChecks);
+            var b = document.getElementById('deployBanner');
+            if (b) b.remove();
+            stopDeployWatch();
+            if (targetPageId(location.hash) !== slug) location.hash = '#/' + slug;
+            else { try { bootPage(slug); } catch (e) {} }
+            return;
+          }
+          throw new Error('HTTP ' + r.status);
+        })
+        .catch(function () {
+          if (txt) txt.textContent = 'Still publishing\u2026 check ' + (deployChecks + 1) +
+            ' (next in ' + Math.round((delays[Math.min(deployChecks, delays.length - 1)]) / 1000) + 's).';
+          if (deployChecks >= 12) {
+            if (txt) txt.textContent = 'Still publishing \u2014 this is taking unusually long. Your page is safe in the repo; try reloading in a few minutes.';
+            stopDeployWatch();
+            return;
+          }
+          deployTimer = setTimeout(attempt, delays[Math.min(deployChecks, delays.length - 1)]);
+        });
+    };
+    deployTimer = setTimeout(attempt, delays[0]);
   }
 
   function updateSaveBar() {
@@ -625,6 +661,41 @@
       .catch(function () { /* sha stays null: save still works, without conflict check */ });
   }
 
+  /* Page content with instant fallback: GitHub Pages first (fast CDN), then
+   * the GitHub API (live seconds after commit, long before Pages rebuilds).
+   * Resolves { md, sha } where sha may be null on the Pages path. */
+  function fetchPageContent(file) {
+    return fetch('pages/' + encodeURIComponent(file), { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text().then(function (t) { return { md: t, sha: null }; });
+      })
+      .catch(function () {
+        return fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/pages/' + encodeURIComponent(file))
+          .then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then(function (j) {
+            if (!j.content) throw new Error('no content');
+            var md;
+            try {
+              md = decodeURIComponent(escape(atob(j.content.replace(/\n/g, ''))));
+            } catch (e) {
+              md = atob(j.content.replace(/\n/g, ''));
+            }
+            return { md: md, sha: j.sha || null };
+          });
+      });
+  }
+
+  /* Minimal meta for pages missing from the (possibly stale) local index —
+   * e.g. just created on another device. Real data arrives on next index load. */
+  function synthesizeMeta(id) {
+    var title = id.replace(/-/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    return { id: id, title: title, category: 'General', icon: 'article', file: id + '.md', updated: null };
+  }
+
   /* Hover pencil affordances on editable headings + lead paragraph. */
   function markEditable() {
     var md = elBody.querySelector('#mdContent');
@@ -723,23 +794,24 @@
         showToast('Create failed: ' + ((res.body && res.body.error) || ('HTTP ' + res.status)));
         return;
       }
-      // Page created successfully! Don't navigate yet — GitHub Pages needs 1–2 min to rebuild.
-      // Keep the editor open and show deployment status. User can keep editing immediately.
+      // Page is committed — navigate straight to it. loadPage resolves via
+      // the API fallback if Pages hasn't rebuilt yet, so it opens in seconds.
+      var iconForCat = 'article';
+      for (var ci = 0; ci < CREATE_CATEGORIES.length; ci++) {
+        if (CREATE_CATEGORIES[ci].id === createCat) iconForCat = CREATE_CATEGORIES[ci].icon;
+      }
+      pagesIndex.unshift({
+        id: slug, title: title, category: createCat, icon: iconForCat,
+        file: slug + '.md', updated: new Date().toISOString().slice(0, 10)
+      });
+      try { renderNav(); } catch (e2) {}
       dirty = false;
       updateSaveBar();
       if (elDrawer) elDrawer.hidden = true;
-      // Create a minimal meta for the new page so renderBody doesn't fail
-      currentMeta = {
-        title: title,
-        category: createCat,
-        file: 'pages/' + slug + '.md',
-        icon: CREATE_CATEGORIES.find(function(c) { return c.id === createCat; })?.icon || 'article',
-        updated: new Date().toISOString().split('T')[0],
-        infobox: { fields: [] }
-      };
-      renderBody();
-      showToast('Page created! Deploying to live site (1–2 min). You can keep editing here.');
+      showToast('Page created! Opening it now — you can keep editing there.');
       showDeployBanner(slug, null);
+      startDeployWatch(slug);
+      location.hash = '#/' + slug;
     }).catch(function (e) {
       console.error('[nwu-wiki] create FAILED', e);
       showToast('Create failed: ' + String((e && e.message) || e).slice(0, 120));
